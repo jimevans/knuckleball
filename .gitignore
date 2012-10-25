@@ -1,0 +1,4 @@
+*.suo
+*.cache
+bin
+obj
