@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.IO;
 
 namespace MP4V2.NET
 {
@@ -23,6 +24,10 @@ namespace MP4V2.NET
         /// <param name="fileName">The full path and file name of the file to use.</param>
         public MP4File(string fileName)
         {
+            if (string.IsNullOrEmpty(fileName) || !File.Exists(fileName))
+            {
+                throw new ArgumentException("Must specify a valid file name", "fileName");
+            }
         }
 
         public string Title { get; set; }
