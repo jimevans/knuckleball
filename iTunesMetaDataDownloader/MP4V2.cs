@@ -86,7 +86,8 @@ namespace iTunesMetaDataDownloader
         //} MP4ItmfDataList;
         public struct MP4ItmfDataList
         {
-            public IntPtr elements;
+            [MarshalAs(UnmanagedType.ByValArray)]
+            public IntPtr[] elements;
             public int size;
         }
 
@@ -121,7 +122,8 @@ namespace iTunesMetaDataDownloader
         [StructLayout(LayoutKind.Sequential)]
         public struct MP4ItmfItemList
         {
-            public IntPtr elements;
+            [MarshalAs(UnmanagedType.ByValArray)]
+            public IntPtr[] elements;
             public int size;
         }
 
@@ -148,6 +150,7 @@ namespace iTunesMetaDataDownloader
         //     uint32_t          size; /**< data size in bytes */
         //     MP4TagArtworkType type; /**< data type */
         // } MP4TagArtwork; 
+        [StructLayout(LayoutKind.Sequential)]
         public struct MP4TagArtwork
         {
             public IntPtr data;
@@ -160,6 +163,7 @@ namespace iTunesMetaDataDownloader
         //     uint16_t index;
         //     uint16_t total;
         // } MP4TagTrack;
+        [StructLayout(LayoutKind.Sequential)]
         public struct MP4TagTrack
         {
             public short index;
@@ -171,6 +175,7 @@ namespace iTunesMetaDataDownloader
         //     uint16_t index;
         //     uint16_t total;
         // } MP4TagDisk;
+        [StructLayout(LayoutKind.Sequential)]
         public struct MP4TagDisk
         {
             public short index;
@@ -240,6 +245,7 @@ namespace iTunesMetaDataDownloader
         //    const uint32_t* composerID;
         //    const char*     xid;
         //} MP4Tags;
+        [StructLayout(LayoutKind.Sequential)]
         public struct MP4Tags
         {
             public IntPtr __handle;
@@ -257,9 +263,9 @@ namespace iTunesMetaDataDownloader
             public IntPtr disk;
             public IntPtr tempo;
             public IntPtr compilation;
-            public IntPtr tvShow;
-            public IntPtr tvNetwork;
-            public IntPtr tvEpisodeID;
+            public string tvShow;
+            public string tvNetwork;
+            public string tvEpisodeID;
             public IntPtr tvSeason;
             public IntPtr tvEpisode;
             public string description;
@@ -294,7 +300,6 @@ namespace iTunesMetaDataDownloader
             public IntPtr composerID;
             public string xid;
         }
-
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         internal static extern IntPtr MP4TagsAlloc();
