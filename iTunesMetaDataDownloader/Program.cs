@@ -6,6 +6,8 @@ using System.Net;
 using Newtonsoft.Json;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Drawing;
+using MP4V2.NET;
 
 namespace iTunesMetaDataDownloader
 {
@@ -16,45 +18,52 @@ namespace iTunesMetaDataDownloader
             //GetMetadata();
 
             //string existingFile = @"E:\Projects\DVD Conversion\Fringe Season 4\Copy.m4v";
-            string existingFile = @"E:\Projects\DVD Conversion\01 A New Day In the Old Town.m4v";
-            IntPtr fileHandle = MP4V2.MP4Modify(existingFile, 0);
-            IntPtr tagsPtr = MP4V2.MP4TagsAlloc();
-            bool fetched = MP4V2.MP4TagsFetch(tagsPtr, fileHandle);
+            string existingFile = @"C:\Projects\mp4v2_wrapper\TestFiles\01 Pilot.m4v";
+            IntPtr fileHandle = NativeMethods.MP4Modify(existingFile, 0);
+            IntPtr tagsPtr = NativeMethods.MP4TagsAlloc();
+            bool fetched = NativeMethods.MP4TagsFetch(tagsPtr, fileHandle);
 
-            MP4V2.MP4Tags tags = (MP4V2.MP4Tags)Marshal.PtrToStructure(tagsPtr, typeof(MP4V2.MP4Tags));
+            NativeMethods.MP4Tags tags = (NativeMethods.MP4Tags)Marshal.PtrToStructure(tagsPtr, typeof(NativeMethods.MP4Tags));
             int epNumber = Marshal.ReadInt32(tags.tvEpisode);
             int season = Marshal.ReadInt32(tags.tvSeason);
-            MP4V2.MP4TagDisk diskInfo = (MP4V2.MP4TagDisk)Marshal.PtrToStructure(tags.disk, typeof(MP4V2.MP4TagDisk));
-            MP4V2.MP4TagTrack trackInfo = (MP4V2.MP4TagTrack)Marshal.PtrToStructure(tags.track, typeof(MP4V2.MP4TagTrack));
-            //MP4V2.MP4TagsSetTVEpisodeID(tagsPtr, "Hello world");
-            //MP4V2.MP4TagsSetEncodedBy(tagsPtr, "jimbo the bimbo");
-            IntPtr extendedPtr = MP4V2.MP4ItmfGetItemsByMeaning(fileHandle, "com.apple.iTunes", "iTunEXTC");
-            MP4V2.MP4ItmfItemList extendedMetaData = (MP4V2.MP4ItmfItemList)Marshal.PtrToStructure(extendedPtr, typeof(MP4V2.MP4ItmfItemList));
+            NativeMethods.MP4TagDisk diskInfo = (NativeMethods.MP4TagDisk)Marshal.PtrToStructure(tags.disk, typeof(NativeMethods.MP4TagDisk));
+            NativeMethods.MP4TagTrack trackInfo = (NativeMethods.MP4TagTrack)Marshal.PtrToStructure(tags.track, typeof(NativeMethods.MP4TagTrack));
+            NativeMethods.MP4TagArtwork artwork = (NativeMethods.MP4TagArtwork)Marshal.PtrToStructure(tags.artwork, typeof(NativeMethods.MP4TagArtwork));
+            byte[] artworkBuffer = new byte[artwork.size];
+            Marshal.Copy(artwork.data, artworkBuffer, 0, artwork.size);
+            Image artworkImage;
+            using (MemoryStream imageStream = new MemoryStream(artworkBuffer))
+            {
+                artworkImage = Image.FromStream(imageStream);
+            }
+            //NativeMethods.MP4TagsSetTVEpisodeID(tagsPtr, "Hello world");
+            //NativeMethods.MP4TagsSetEncodedBy(tagsPtr, "jimbo the bimbo");
+            byte mediaType = Marshal.ReadByte(tags.mediaType);
+            IntPtr extendedPtr = NativeMethods.MP4ItmfGetItemsByMeaning(fileHandle, "com.apple.iTunes", "iTunEXTC");
+            NativeMethods.MP4ItmfItemList extendedMetaData = (NativeMethods.MP4ItmfItemList)Marshal.PtrToStructure(extendedPtr, typeof(NativeMethods.MP4ItmfItemList));
             for (int i = 0; i < extendedMetaData.size; i++)
             {
-                IntPtr itemPtr = new IntPtr(extendedMetaData.elements.ToInt32() + (i * Marshal.SizeOf(extendedMetaData.elements)));
-                MP4V2.MP4ItmfItem item = (MP4V2.MP4ItmfItem)Marshal.PtrToStructure(itemPtr, typeof(MP4V2.MP4ItmfItem));
-                MP4V2.MP4ItmfDataList dataList = item.dataList;
+                //IntPtr itemPtr = new IntPtr(extendedMetaData.elements.ToInt32() + (i * Marshal.SizeOf(extendedMetaData.elements)));
+                IntPtr itemPtr = extendedMetaData.elements[i];
+                NativeMethods.MP4ItmfItem item = (NativeMethods.MP4ItmfItem)Marshal.PtrToStructure(itemPtr, typeof(NativeMethods.MP4ItmfItem));
+                NativeMethods.MP4ItmfDataList dataList = item.dataList;
                 for (int j = 0; j < dataList.size; j++)
                 {
-                    IntPtr dataListItemPtr = new IntPtr(dataList.elements.ToInt32() + (i * Marshal.SizeOf(extendedMetaData.elements)));
-                    MP4V2.MP4ItmfData data = (MP4V2.MP4ItmfData)Marshal.PtrToStructure(dataListItemPtr, typeof(MP4V2.MP4ItmfData));
+                    IntPtr dataListItemPtr = dataList.elements[i];
+                    NativeMethods.MP4ItmfData data = (NativeMethods.MP4ItmfData)Marshal.PtrToStructure(dataListItemPtr, typeof(NativeMethods.MP4ItmfData));
                     byte[] buffer = new byte[data.valueSize];
-                    for (int offset = 0; offset < data.valueSize; offset++)
-                    {
-                        buffer[offset] = Marshal.ReadByte(data.value, offset);
-                    }
-                    if (data.typeCode == MP4V2.MP4ItmfBasicType.Utf8)
+                    Marshal.Copy(data.value, buffer, 0, data.valueSize);
+                    if (data.typeCode == NativeMethods.MP4ItmfBasicType.Utf8)
                     {
                         string dataValue = Encoding.UTF8.GetString(buffer);
                     }
                 }
-                //MP4V2.MP4ItmfRemoveItem(fileHandle, extendedMetaData.elements);
+                //NativeMethods.MP4ItmfRemoveItem(fileHandle, extendedMetaData.elements);
             }
-            MP4V2.MP4ItmfItemListFree(extendedPtr);
-            bool stored = MP4V2.MP4TagsStore(tagsPtr, fileHandle);
-            MP4V2.MP4TagsFree(tagsPtr);
-            MP4V2.MP4Close(fileHandle);
+            NativeMethods.MP4ItmfItemListFree(extendedPtr);
+            //bool stored = NativeMethods.MP4TagsStore(tagsPtr, fileHandle);
+            NativeMethods.MP4TagsFree(tagsPtr);
+            NativeMethods.MP4Close(fileHandle);
         }
 
         private static void GetMetadata()
