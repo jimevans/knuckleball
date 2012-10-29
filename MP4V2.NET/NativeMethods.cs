@@ -155,7 +155,7 @@ namespace MP4V2.NET
         {
             public IntPtr data;
             public int size;
-            ArtworkType type;
+            public ArtworkType type;
         }
 
         // typedef struct MP4TagTrack_s

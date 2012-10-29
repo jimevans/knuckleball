@@ -59,6 +59,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -66,14 +67,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MovieReadTagTests.cs" />
+    <Compile Include="TestFileUtilities.cs" />
     <Compile Include="MP4FileTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TVEpisodeReadTagTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MP4V2.NET\MP4V2.NET.csproj">
       <Project>{B162971A-501C-468A-9C4A-466FC9027881}</Project>
       <Name>MP4V2.NET</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="TestFiles\Movie.m4v">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\TVEpisode.m4v">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
