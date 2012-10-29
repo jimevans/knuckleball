@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="MediaType.cs" company="">
+// <copyright file="ContentRating.cs" company="">
 // TODO: Update copyright text.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -8,21 +8,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace MP4V2.NET
+namespace Knuckleball
 {
     /// <summary>
     /// TODO: Update summary.
     /// </summary>
-    public enum MediaKind
+    public enum ContentRating
     {
         NotSet = -1,
-        Unknown = 0,
-        Music = 1,
-        Audiobook = 2,
-        MusicVideo = 6,
-        Movie = 9,
-        TVShow = 10,
-        Booklet = 11,
-        Ringtone = 14
+        None = 0,
+        Clean = 2,
+        Explicit = 4
     }
 }

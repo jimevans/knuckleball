@@ -14,13 +14,13 @@ using System.Security.Cryptography;
 using System.Drawing;
 using System.Drawing.Imaging;
 
-namespace MP4V2.NET.Tests
+namespace Knuckleball.Tests
 {
     /// <summary>
     /// TODO: Update summary.
     /// </summary>
     [TestFixture]
-    public class MovieReadTagTests
+    public class TVEpisodeReadTagTests
     {
         MP4File file = null;
 
@@ -28,7 +28,7 @@ namespace MP4V2.NET.Tests
         public void SetUp()
         {
             string directory = TestFileUtilities.GetTestFileDirectory();
-            string fileName = Path.Combine(directory, "Movie.m4v");
+            string fileName = Path.Combine(directory, "TVEpisode.m4v");
             this.file = new MP4File(fileName);
             this.file.ReadTags();
         }
@@ -36,13 +36,13 @@ namespace MP4V2.NET.Tests
         [Test]
         public void ShouldReadTitle()
         {
-            Assert.AreEqual("PuzzleQuest II: The PuzzleMaster Strikes Back", file.Title);
+            Assert.AreEqual("The PuzzleMaster Strikes Back", file.Title);
         }
 
         [Test]
         public void ShouldReadArtist()
         {
-            Assert.AreEqual("Jim Evans", file.Artist);
+            Assert.AreEqual("PuzzleQuest", file.Artist);
         }
 
         [Test]
@@ -50,13 +50,13 @@ namespace MP4V2.NET.Tests
         {
             // TODO: Fix the tags in the TV Episode file
             // Assert.AreEqual("PuzzleQuest, Season 2", file.Album);
-            Assert.IsNull(file.Album);
+            Assert.AreEqual("PuzzleQuest", file.Album);
         }
 
         [Test]
         public void ShouldReadAlbumArtist()
         {
-            Assert.IsNull(file.AlbumArtist);
+            Assert.AreEqual("PuzzleQuest", file.AlbumArtist);
         }
 
         [Test]
@@ -80,31 +80,31 @@ namespace MP4V2.NET.Tests
         [Test]
         public void ShouldReadGenre()
         {
-            Assert.AreEqual("Horror", file.Genre);
+            Assert.AreEqual("Drama", file.Genre);
         }
 
         [Test]
         public void ShouldReadTrackNumber()
         {
-            Assert.IsNull(file.TrackNumber);
+            Assert.AreEqual(3, file.TrackNumber);
         }
 
         [Test]
         public void ShouldReadTotalTracks()
         {
-            Assert.IsNull(file.TotalTracks);
+            Assert.AreEqual(0, file.TotalTracks);
         }
 
         [Test]
         public void ShouldReadDiskNumber()
         {
-            Assert.IsNull(file.DiskNumber);
+            Assert.AreEqual(1, file.DiskNumber);
         }
 
         [Test]
         public void ShouldReadTotalDisks()
         {
-            Assert.IsNull(file.TotalDisks);
+            Assert.AreEqual(1, file.TotalDisks);
         }
 
         [Test]
@@ -140,7 +140,7 @@ namespace MP4V2.NET.Tests
         [Test]
         public void ShouldReadSortName()
         {
-            Assert.IsNull(file.SortName);
+            Assert.AreEqual("PuzzleMaster Strikes Back", file.SortName);
         }
 
         [Test]
@@ -152,7 +152,7 @@ namespace MP4V2.NET.Tests
         [Test]
         public void ShouldReadSortAlbum()
         {
-            Assert.IsNull(file.SortAlbum);
+            Assert.AreEqual("PuzzleQuest, Season 2", file.SortAlbum);
         }
 
         [Test]
@@ -189,7 +189,7 @@ namespace MP4V2.NET.Tests
         [Test]
         public void ShouldReadCopyright()
         {
-            Assert.AreEqual("Â© 2008 PuzzleMaster Productions", file.Copyright);
+            Assert.IsNull(file.Copyright);
         }
 
         [Test]
@@ -231,7 +231,7 @@ namespace MP4V2.NET.Tests
         [Test]
         public void ShouldReadMediaType()
         {
-            Assert.AreEqual(MediaKind.Movie, file.MediaType);
+            Assert.AreEqual(MediaKind.TVShow, file.MediaType);
         }
 
         [Test]
@@ -305,25 +305,25 @@ namespace MP4V2.NET.Tests
         [Test]
         public void ShouldReadEpisodeNumber()
         {
-            Assert.IsNull(file.EpisodeNumber);
+            Assert.AreEqual(3, file.EpisodeNumber);
         }
 
         [Test]
         public void ShouldReadSeasonNumber()
         {
-            Assert.IsNull(file.SeasonNumber);
+            Assert.AreEqual(2, file.SeasonNumber);
         }
 
         [Test]
         public void ShouldReadEpisodeID()
         {
-            Assert.IsNull(file.EpisodeID);
+            Assert.AreEqual("PQS2E3", file.EpisodeID);
         }
 
         [Test]
         public void ShouldReadTVShow()
         {
-            Assert.IsNull(file.TVShow);
+            Assert.AreEqual("PuzzleQuest", file.TVShow);
         }
 
         [Test]

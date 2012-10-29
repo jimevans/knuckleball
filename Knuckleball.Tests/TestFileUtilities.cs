@@ -10,7 +10,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 
-namespace MP4V2.NET.Tests
+namespace Knuckleball.Tests
 {
 
     /// <summary>

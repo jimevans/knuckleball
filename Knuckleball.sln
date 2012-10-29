@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iTunesMetaDataDownloader", "iTunesMetaDataDownloader\iTunesMetaDataDownloader.csproj", "{5F60AF65-751B-413A-BFAE-50BE478658D4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Knuckleball", "Knuckleball\Knuckleball.csproj", "{B162971A-501C-468A-9C4A-466FC9027881}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MP4V2.NET", "MP4V2.NET\MP4V2.NET.csproj", "{B162971A-501C-468A-9C4A-466FC9027881}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MP4V2.NET.Tests", "MP4V2.NET.Tests\MP4V2.NET.Tests.csproj", "{6A9B186C-7CC0-4E20-AFDD-78A7F0D820B1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Knuckleball.Tests", "Knuckleball.Tests\Knuckleball.Tests.csproj", "{6A9B186C-7CC0-4E20-AFDD-78A7F0D820B1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="ContentRating.cs" company="">
+// <copyright file="MediaStoreAccountKind.cs" company="">
 // TODO: Update copyright text.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -8,16 +8,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace MP4V2.NET
+namespace Knuckleball
 {
     /// <summary>
     /// TODO: Update summary.
     /// </summary>
-    public enum ContentRating
+    public enum MediaStoreAccountKind
     {
         NotSet = -1,
-        None = 0,
-        Clean = 2,
-        Explicit = 4
+        iTunes = 0,
+        AOL = 1
     }
 }

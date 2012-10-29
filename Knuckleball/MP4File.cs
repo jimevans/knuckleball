@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 using System.IO;
 using System.Drawing.Imaging;
 
-namespace MP4V2.NET
+namespace Knuckleball
 {
     /// <summary>
     /// TODO: Update summary.

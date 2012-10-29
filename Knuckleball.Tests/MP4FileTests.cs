@@ -5,7 +5,7 @@ using System.IO;
 using System.Text;
 using NUnit.Framework;
 
-namespace MP4V2.NET.Tests
+namespace Knuckleball.Tests
 {
     [TestFixture]
     public class MP4FileTests
