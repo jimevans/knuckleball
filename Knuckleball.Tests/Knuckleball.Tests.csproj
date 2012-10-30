@@ -67,6 +67,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IntPtrExtensionTests.cs" />
     <Compile Include="MovieReadTagTests.cs" />
     <Compile Include="TestFileUtilities.cs" />
     <Compile Include="MP4FileTests.cs" />

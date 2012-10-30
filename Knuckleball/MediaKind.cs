@@ -23,6 +23,8 @@ namespace Knuckleball
         Movie = 9,
         TVShow = 10,
         Booklet = 11,
-        Ringtone = 14
+        Ringtone = 14,
+        Podcast = 21,
+        iTunesU = 23
     }
 }

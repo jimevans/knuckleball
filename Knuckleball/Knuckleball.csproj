@@ -63,8 +63,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Atom.cs" />
     <Compile Include="ContentRating.cs" />
+    <Compile Include="MovieInfo.cs" />
     <Compile Include="Country.cs" />
+    <Compile Include="IntPtrExtensions.cs" />
+    <Compile Include="RatingInfo.cs" />
     <Compile Include="MediaKind.cs" />
     <Compile Include="MediaStoreAccountKind.cs" />
     <Compile Include="MP4File.cs" />

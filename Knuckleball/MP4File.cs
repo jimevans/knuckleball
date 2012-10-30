@@ -45,7 +45,7 @@ namespace Knuckleball
         public string Comment { get; set; }
         public string Genre { get; set; }
         public short GenreType { get; set; }
-        public string releaseDate { get; set; }
+        public string ReleaseDate { get; set; }
         public int? TrackNumber { get; set; }
         public int? TotalTracks { get; set; }
         public int? DiskNumber { get; set; }
@@ -88,6 +88,8 @@ namespace Knuckleball
         public int? GenreID { get; set; }
         public int? ComposerID { get; set; }
         public string Xid { get; set; }
+        public RatingInfo RatingInfo { get; set; }
+        public MovieInfo MovieInfo { get; set; }
 
         public Image Artwork 
         {
@@ -104,7 +106,7 @@ namespace Knuckleball
             IntPtr fileHandle = NativeMethods.MP4Read(this.fileName);
             IntPtr tagPtr = NativeMethods.MP4TagsAlloc();
             NativeMethods.MP4TagsFetch(tagPtr, fileHandle);
-            NativeMethods.MP4Tags tags = ConvertStructure<NativeMethods.MP4Tags>(tagPtr);
+            NativeMethods.MP4Tags tags = tagPtr.ReadStructure<NativeMethods.MP4Tags>();
             this.Title = tags.name;
             this.Artist = tags.artist;
             this.AlbumArtist = tags.albumArtist;
@@ -115,15 +117,15 @@ namespace Knuckleball
             this.Genre = tags.genre;
             this.ReadTrackInfo(tags.track);
             this.ReadDiskInfo(tags.disk);
-            this.Tempo = ReadShort(tags.tempo);
-            this.IsCompilation = ReadBoolean(tags.compilation);
+            this.Tempo = tags.tempo.ReadShort();
+            this.IsCompilation = tags.compilation.ReadBoolean();
             this.Copyright = tags.copyright;
             this.EncodingTool = tags.encodingTool;
             this.EncodedBy = tags.encodedBy;
 
             // Tags specific to TV Episodes.
-            this.EpisodeNumber = ReadInt(tags.tvEpisode);
-            this.SeasonNumber = ReadInt(tags.tvSeason);
+            this.EpisodeNumber = tags.tvEpisode.ReadInt();
+            this.SeasonNumber = tags.tvSeason.ReadInt();
             this.EpisodeID = tags.tvEpisodeID;
             this.TVNetwork = tags.tvNetwork;
             this.TVShow = tags.tvShow;
@@ -142,114 +144,35 @@ namespace Knuckleball
             this.ArtworkCount = tags.artworkCount;
             this.ReadArtwork(tags.artwork);
 
-            this.IsPodcast = ReadBoolean(tags.podcast);
+            this.IsPodcast = tags.podcast.ReadBoolean();
             this.Keywords = tags.keywords;
             this.Category = tags.category;
 
-            this.IsHDVideo = ReadBoolean(tags.hdVideo);
-            this.MediaType = ReadEnumValue<MediaKind, byte>(tags.mediaType, MediaKind.NotSet);
-            this.ContentRating = ReadEnumValue<ContentRating, byte>(tags.contentRating, ContentRating.NotSet);
-            this.IsGapless = ReadBoolean(tags.gapless);
+            this.IsHDVideo = tags.hdVideo.ReadBoolean();
+            this.MediaType = tags.mediaType.ReadEnumValue<MediaKind, byte>(MediaKind.NotSet);
+            this.ContentRating = tags.contentRating.ReadEnumValue<ContentRating, byte>(ContentRating.NotSet);
+            this.IsGapless = tags.gapless.ReadBoolean();
 
             this.MediaStoreAccount = tags.itunesAccount;
-            this.MediaStoreCountry = ReadEnumValue<Country, int>(tags.iTunesCountry, Country.NotSet);
-            this.MediaStoreAccountType = ReadEnumValue<MediaStoreAccountKind, byte>(tags.iTunesAccountType, MediaStoreAccountKind.NotSet);
-            this.ContentID = ReadInt(tags.contentID);
-            this.ArtistID = ReadInt(tags.artistID);
-            this.PlaylistID = ReadLong(tags.playlistID);
-            this.GenreID = ReadInt(tags.genreID);
-            this.ComposerID = ReadInt(tags.composerID);
+            this.MediaStoreCountry = tags.iTunesCountry.ReadEnumValue<Country, int>(Country.NotSet);
+            this.MediaStoreAccountType = tags.iTunesAccountType.ReadEnumValue<MediaStoreAccountKind, byte>(MediaStoreAccountKind.NotSet);
+            this.ContentID = tags.contentID.ReadInt();
+            this.ArtistID = tags.artistID.ReadInt();
+            this.PlaylistID = tags.playlistID.ReadInt();
+            this.GenreID = tags.genreID.ReadInt();
+            this.ComposerID = tags.composerID.ReadInt();
             this.Xid = tags.xid;
 
             NativeMethods.MP4TagsFree(tagPtr);
+
+            this.RatingInfo = ReadRawAtom<RatingInfo>(fileHandle, "com.apple.iTunes", "iTunEXTC");
+            this.MovieInfo = ReadRawAtom<MovieInfo>(fileHandle, "com.apple.iTunes", "iTunMOVI");
+
             NativeMethods.MP4Close(fileHandle);
         }
 
         public void WriteTags()
         {
-        }
-
-        private int? ReadInt(IntPtr pointer)
-        {
-            if (pointer == IntPtr.Zero)
-            {
-                return null;
-            }
-
-            return Marshal.ReadInt32(pointer);
-        }
-
-        private long? ReadLong(IntPtr pointer)
-        {
-            if (pointer == IntPtr.Zero)
-            {
-                return null;
-            }
-
-            return Marshal.ReadInt64(pointer);
-        }
-
-        private short? ReadShort(IntPtr pointer)
-        {
-            if (pointer == IntPtr.Zero)
-            {
-                return null;
-            }
-
-            return Marshal.ReadInt16(pointer);
-        }
-
-        private bool? ReadBoolean(IntPtr pointer)
-        {
-            if (pointer == IntPtr.Zero)
-            {
-                return null;
-            }
-            
-            return Marshal.ReadByte(pointer) != 0;
-        }
-
-        private byte? ReadByte(IntPtr pointer)
-        {
-            if (pointer == IntPtr.Zero)
-            {
-                return null;
-            }
-            
-            return Marshal.ReadByte(pointer);
-        }
-
-        private T ConvertStructure<T>(IntPtr structPtr)
-        {
-            return (T)Marshal.PtrToStructure(structPtr, typeof(T));
-        }
-
-        private T ReadEnumValue<T, U>(IntPtr pointer, T defaultValue) where T : struct where U: struct
-        {
-            if (pointer == IntPtr.Zero)
-            {
-                return defaultValue;
-            }
-
-            object rawValue;
-            if (typeof(U) == typeof(byte))
-            {
-                rawValue = ReadByte(pointer).Value;
-            } 
-            else if (typeof(U) == typeof(long))
-            {
-                rawValue = ReadLong(pointer).Value;
-            }
-            else if (typeof(U) == typeof(short))
-            {
-                rawValue = ReadShort(pointer).Value;
-            }
-            else
-            {
-                rawValue = ReadInt(pointer).Value;
-            }
-
-            return (T)Enum.ToObject(typeof(T), rawValue);
         }
 
         private void ReadArtwork(IntPtr artworkStructurePointer)
@@ -259,7 +182,7 @@ namespace Knuckleball
                 return;
             }
 
-            NativeMethods.MP4TagArtwork artwork = ConvertStructure<NativeMethods.MP4TagArtwork>(artworkStructurePointer);
+            NativeMethods.MP4TagArtwork artwork = artworkStructurePointer.ReadStructure<NativeMethods.MP4TagArtwork>();
             byte[] artworkBuffer = new byte[artwork.size];
             Marshal.Copy(artwork.data, artworkBuffer, 0, artwork.size);
             Image artworkImage;
@@ -301,7 +224,7 @@ namespace Knuckleball
                 return;
             }
 
-            NativeMethods.MP4TagDisk diskInfo = ConvertStructure<NativeMethods.MP4TagDisk>(diskInfoPointer);
+            NativeMethods.MP4TagDisk diskInfo = diskInfoPointer.ReadStructure<NativeMethods.MP4TagDisk>();
             this.DiskNumber = diskInfo.index;
             this.TotalDisks = diskInfo.total;
         }
@@ -313,9 +236,23 @@ namespace Knuckleball
                 return;
             }
 
-            NativeMethods.MP4TagTrack trackInfo = ConvertStructure<NativeMethods.MP4TagTrack>(trackInfoPointer);
+            NativeMethods.MP4TagTrack trackInfo = trackInfoPointer.ReadStructure<NativeMethods.MP4TagTrack>();
             this.TrackNumber = trackInfo.index;
             this.TotalTracks = trackInfo.total;
+        }
+
+        private T ReadRawAtom<T>(IntPtr fileHandle, string atomMeaning, string atomName) where T : Atom, new()
+        {
+            T atom = null;
+            IntPtr rawAtomPointer = NativeMethods.MP4ItmfGetItemsByMeaning(fileHandle, atomMeaning, atomName);
+            if (rawAtomPointer != IntPtr.Zero)
+            {   
+                // Must use this construct, as generics don't allow constructors with parameters.
+                atom = new T();
+                atom.Initialize(rawAtomPointer);
+            }
+
+            return atom;
         }
     }
 }

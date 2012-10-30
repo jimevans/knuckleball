@@ -300,6 +300,26 @@ namespace Knuckleball.Tests
             Assert.IsNull(file.Xid);
         }
 
+        [Test]
+        public void ShouldReadRating()
+        {
+            Assert.AreEqual("mpaa", file.RatingInfo.RatingSource);
+            Assert.AreEqual("PG-13", file.RatingInfo.Rating);
+            Assert.AreEqual(300, file.RatingInfo.SortValue);
+            Assert.IsNullOrEmpty(file.RatingInfo.RatingAnnotation);
+            Assert.AreEqual("mpaa|PG-13|300|", file.RatingInfo.ToString());
+        }
+
+        [Test]
+        public void ShouldReadMovieInfo()
+        {
+            Assert.That(file.MovieInfo.Cast, Is.EquivalentTo(new List<string>() { "The PuzzleMaster", "Jimmy Bear" }));
+            Assert.That(file.MovieInfo.Directors, Is.EquivalentTo(new List<string>() { "Jim Evans" }));
+            Assert.That(file.MovieInfo.Producers, Is.EquivalentTo(new List<string>() { "Jim Evans", "John Smith" }));
+            Assert.That(file.MovieInfo.Screenwriters, Is.EquivalentTo(new List<string>() { "Herman J. Manciewicz" }));
+            Assert.AreEqual("PuzzleMaster Studios", file.MovieInfo.Studio);
+        }
+
         // The following are tags unique to TV Episodes
 
         [Test]

@@ -300,6 +300,26 @@ namespace Knuckleball.Tests
             Assert.IsNull(file.Xid);
         }
 
+        [Test]
+        public void ShouldReadRatingInfo()
+        {
+            Assert.AreEqual("us-tv", file.RatingInfo.RatingSource);
+            Assert.AreEqual("TV-14", file.RatingInfo.Rating);
+            Assert.AreEqual(500, file.RatingInfo.SortValue);
+            Assert.IsNullOrEmpty(file.RatingInfo.RatingAnnotation);
+            Assert.AreEqual("us-tv|TV-14|500|", file.RatingInfo.ToString());
+        }
+
+        [Test]
+        public void ShouldReadMovieInfo()
+        {
+            Assert.IsNull(file.MovieInfo.Cast);
+            Assert.IsNull(file.MovieInfo.Directors);
+            Assert.IsNull(file.MovieInfo.Producers);
+            Assert.IsNull(file.MovieInfo.Screenwriters);
+            Assert.IsNull(file.MovieInfo.Studio);
+        }
+
         // The following are tags unique to TV Episodes
 
         [Test]
