@@ -98,13 +98,13 @@ namespace Knuckleball.Tests
         [Test]
         public void ShouldReadDiskNumber()
         {
-            Assert.AreEqual(1, file.DiskNumber);
+            Assert.AreEqual(1, file.DiscNumber);
         }
 
         [Test]
         public void ShouldReadTotalDisks()
         {
-            Assert.AreEqual(1, file.TotalDisks);
+            Assert.AreEqual(1, file.TotalDiscs);
         }
 
         [Test]
@@ -261,37 +261,37 @@ namespace Knuckleball.Tests
         [Test]
         public void ShouldReadMediaStoreCountry()
         {
-            Assert.AreEqual(Country.NotSet, file.MediaStoreCountry);
+            Assert.AreEqual(Country.None, file.MediaStoreCountry);
         }
         
         [Test]
-        public void ShouldReadContentID()
+        public void ShouldReadContentId()
         {
-            Assert.IsNull(file.ContentID);
+            Assert.IsNull(file.ContentId);
         }
         
         [Test]
-        public void ShouldReadArtistID()
+        public void ShouldReadArtistId()
         {
-            Assert.IsNull(file.ArtistID);
+            Assert.IsNull(file.ArtistId);
         }
         
         [Test]
-        public void ShouldReadPlaylistID()
+        public void ShouldReadPlaylistId()
         {
-            Assert.IsNull(file.PlaylistID);
+            Assert.IsNull(file.PlaylistId);
         }
         
         [Test]
-        public void ShouldReadGenreID()
+        public void ShouldReadGenreId()
         {
-            Assert.IsNull(file.GenreID);
+            Assert.IsNull(file.GenreId);
         }
         
         [Test]
-        public void ShouldReadComposerID()
+        public void ShouldReadComposerId()
         {
-            Assert.IsNull(file.ComposerID);
+            Assert.IsNull(file.ComposerId);
         }
         
         [Test]
@@ -335,9 +335,9 @@ namespace Knuckleball.Tests
         }
 
         [Test]
-        public void ShouldReadEpisodeID()
+        public void ShouldReadEpisodeId()
         {
-            Assert.AreEqual("PQS2E3", file.EpisodeID);
+            Assert.AreEqual("PQS2E3", file.EpisodeId);
         }
 
         [Test]

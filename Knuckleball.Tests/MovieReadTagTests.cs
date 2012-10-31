@@ -98,13 +98,13 @@ namespace Knuckleball.Tests
         [Test]
         public void ShouldReadDiskNumber()
         {
-            Assert.IsNull(file.DiskNumber);
+            Assert.IsNull(file.DiscNumber);
         }
 
         [Test]
         public void ShouldReadTotalDisks()
         {
-            Assert.IsNull(file.TotalDisks);
+            Assert.IsNull(file.TotalDiscs);
         }
 
         [Test]
@@ -261,37 +261,37 @@ namespace Knuckleball.Tests
         [Test]
         public void ShouldReadMediaStoreCountry()
         {
-            Assert.AreEqual(Country.NotSet, file.MediaStoreCountry);
+            Assert.AreEqual(Country.None, file.MediaStoreCountry);
         }
         
         [Test]
-        public void ShouldReadContentID()
+        public void ShouldReadContentId()
         {
-            Assert.IsNull(file.ContentID);
+            Assert.IsNull(file.ContentId);
         }
         
         [Test]
-        public void ShouldReadArtistID()
+        public void ShouldReadArtistId()
         {
-            Assert.IsNull(file.ArtistID);
+            Assert.IsNull(file.ArtistId);
         }
         
         [Test]
-        public void ShouldReadPlaylistID()
+        public void ShouldReadPlaylistId()
         {
-            Assert.IsNull(file.PlaylistID);
+            Assert.IsNull(file.PlaylistId);
         }
         
         [Test]
-        public void ShouldReadGenreID()
+        public void ShouldReadGenreId()
         {
-            Assert.IsNull(file.GenreID);
+            Assert.IsNull(file.GenreId);
         }
         
         [Test]
-        public void ShouldReadComposerID()
+        public void ShouldReadComposerId()
         {
-            Assert.IsNull(file.ComposerID);
+            Assert.IsNull(file.ComposerId);
         }
         
         [Test]
@@ -335,9 +335,9 @@ namespace Knuckleball.Tests
         }
 
         [Test]
-        public void ShouldReadEpisodeID()
+        public void ShouldReadEpisodeId()
         {
-            Assert.IsNull(file.EpisodeID);
+            Assert.IsNull(file.EpisodeId);
         }
 
         [Test]

@@ -1,16 +1,26 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="MP4File.cs" company="">
-// TODO: Update copyright text.
+// <copyright file="MP4File.cs" company="Knuckleball Project">
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+//
+// Portions created by Jim Evans are Copyright © 2012.
+// All Rights Reserved.
+//
+// Contributors:
+//     Jim Evans, james.h.evans.jr@@gmail.com
+//
 // </copyright>
 // -----------------------------------------------------------------------
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
-using System.Runtime.InteropServices;
-using System.IO;
 using System.Drawing.Imaging;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Knuckleball
 {
@@ -36,64 +46,305 @@ namespace Knuckleball
             this.fileName = fileName;
         }
 
+        /// <summary>
+        /// Gets or sets the title of the content contained in this file.
+        /// </summary>
         public string Title { get; set; }
+
+        /// <summary>
+        /// Gets or sets the artist of the content contained in this file.
+        /// </summary>
         public string Artist { get; set; }
+
+        /// <summary>
+        /// Gets or sets the album artist of the content contained in this file.
+        /// </summary>
         public string AlbumArtist { get; set; }
+
+        /// <summary>
+        /// Gets or sets the album of the content contained in this file.
+        /// </summary>
         public string Album { get; set; }
+
+        /// <summary>
+        /// Gets or sets the grouping of the content contained in this file.
+        /// </summary>
         public string Grouping { get; set; }
+
+        /// <summary>
+        /// Gets or sets the composer of the content contained in this file.
+        /// </summary>
         public string Composer { get; set; }
+
+        /// <summary>
+        /// Gets or sets the comments of the content contained in this file.
+        /// </summary>
         public string Comment { get; set; }
+
+        /// <summary>
+        /// Gets or sets the genre of the content contained in this file.
+        /// </summary>
         public string Genre { get; set; }
+
+        /// <summary>
+        /// Gets or sets the genre type of the content contained in this file.
+        /// </summary>
         public short GenreType { get; set; }
+
+        /// <summary>
+        /// Gets or sets the release date of the content contained in this file.
+        /// </summary>
         public string ReleaseDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the track number of the content contained in this file.
+        /// May be <see langword="null"/> if the value is not set in the file.
+        /// </summary>
         public int? TrackNumber { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the total number of tracks of the content contained in this file.
+        /// May be <see langword="null"/> if the value is not set in the file.
+        /// </summary>
         public int? TotalTracks { get; set; }
-        public int? DiskNumber { get; set; }
-        public int? TotalDisks { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the disc number of tracks of the content contained in this file.
+        /// /// May be <see langword="null"/> if the value is not set in the file.
+        /// </summary>
+        public int? DiscNumber { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the total number of discs of the content contained in this file.
+        /// May be <see langword="null"/> if the value is not set in the file.
+        /// </summary>
+        public int? TotalDiscs { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the tempo of the content contained in this file.
+        /// May be <see langword="null"/> if the value is not set in the file.
+        /// </summary>
         public short? Tempo { get; set; }
+        
+        /// <summary>
+        /// Gets or sets a value indicating whether the content contained in this file is part of a compilation.
+        /// May be <see langword="null"/> if the value is not set in the file.
+        /// </summary>
         public bool? IsCompilation { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the TV show for the content contained in this file.
+        /// </summary>
         public string TVShow { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the name of the TV network for the content contained in this file.
+        /// </summary>
         public string TVNetwork { get; set; }
-        public string EpisodeID { get; set; }
+
+        /// <summary>
+        /// Gets or sets the episode ID of the content contained in this file.
+        /// </summary>
+        public string EpisodeId { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the season number of the content contained in this file.
+        /// May be <see langword="null"/> if the value is not set in the file.
+        /// </summary>
         public int? SeasonNumber { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the episode number of the content contained in this file.
+        /// May be <see langword="null"/> if the value is not set in the file.
+        /// </summary>
         public int? EpisodeNumber { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the description of the content contained in this file.
+        /// </summary>
         public string Description { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the long description of the content contained in this file.
+        /// </summary>
         public string LongDescription { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the lyrics of the content contained in this file.
+        /// </summary>
         public string Lyrics { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the sort name for the content contained in this file.
+        /// </summary>
         public string SortName { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the sort artist for the content contained in this file.
+        /// </summary>
         public string SortArtist { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the sort album artist for the content contained in this file.
+        /// </summary>
         public string SortAlbumArtist { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the sort album for the content contained in this file.
+        /// </summary>
         public string SortAlbum { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the sort composer for the content contained in this file.
+        /// </summary>
         public string SortComposer { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the sort TV show name for the content contained in this file.
+        /// </summary>
         public string SortTVShow { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the count of the artwork contained in this file.
+        /// </summary>
         public int ArtworkCount { get; set; }
+        
+        /// <summary>
+        /// Gets the format of the artwork contained in this file.
+        /// </summary>
         public ImageFormat ArtworkFormat { get; private set; }
+        
+        /// <summary>
+        /// Gets or sets the copyright information for the content contained in this file.
+        /// </summary>
         public string Copyright { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the name of the encoding tool used for the content contained in this file.
+        /// </summary>
         public string EncodingTool { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the name of the person who encoded the content contained in this file.
+        /// </summary>
         public string EncodedBy { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the date this file was purchased from a media store.
+        /// </summary>
         public string PurchasedDate { get; set; }
+        
+        /// <summary>
+        /// Gets or sets a value indicating whether the content contained in this file is part of a podcast.
+        /// May be <see langword="null"/> if the value is not set in the file.
+        /// </summary>
         public bool? IsPodcast { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the podcast keywords for the content contained in this file.
+        /// </summary>
         public string Keywords { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the podcast category for the content contained in this file.
+        /// </summary>
         public string Category { get; set; }
+        
+        /// <summary>
+        /// Gets or sets a value indicating whether the content contained in this file is high-definition video.
+        /// May be <see langword="null"/> if the value is not set in the file.
+        /// </summary>
         public bool? IsHDVideo { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the type of media for the content contained in this file.
+        /// </summary>
         public MediaKind MediaType { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the content rating for the content contained in this file.
+        /// </summary>
         public ContentRating ContentRating { get; set; }
+        
+        /// <summary>
+        /// Gets or sets a value indicating whether the content contained in this file is part of a gapless playback album.
+        /// May be <see langword="null"/> if the value is not set in the file.
+        /// </summary>
         public bool? IsGapless { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the account used to purchase this file from a media store, such as iTunes.
+        /// </summary>
         public string MediaStoreAccount { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the type of account used to purchase this file from a media store, such as iTunes.
+        /// </summary>
         public MediaStoreAccountKind MediaStoreAccountType { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the country where this file was purchased from a media store, such as iTunes.
+        /// </summary>
         public Country MediaStoreCountry { get; set; }
-        public int? ContentID { get; set; }
-        public int? ArtistID { get; set; }
-        public long? PlaylistID { get; set; }
-        public int? GenreID { get; set; }
-        public int? ComposerID { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the media store ID of the of the content contained in this file.
+        /// May be <see langword="null"/> if the value is not set in the file.
+        /// </summary>
+        public int? ContentId { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the media store ID of the of the artist of the content contained in this file.
+        /// May be <see langword="null"/> if the value is not set in the file.
+        /// </summary>
+        public int? ArtistId { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the playlist ID of this file.
+        /// May be <see langword="null"/> if the value is not set in the file.
+        /// </summary>
+        public long? PlaylistId { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the ID of the of the genre of the content contained in this file.
+        /// May be <see langword="null"/> if the value is not set in the file.
+        /// </summary>
+        public int? GenreId { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the media store ID of the of the composer of the content contained in this file.
+        /// May be <see langword="null"/> if the value is not set in the file.
+        /// </summary>
+        public int? ComposerId { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the X ID of this file.
+        /// </summary>
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "Xid is spelled consistently with the external API.")]
         public string Xid { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the ratings information for the content contained in this file, including source
+        /// of the rating and the rating value.
+        /// </summary>
         public RatingInfo RatingInfo { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the movie information for the content contained in this file, including cast,
+        /// directors, producers, and writers.
+        /// </summary>
         public MovieInfo MovieInfo { get; set; }
 
+        /// <summary>
+        /// Gets or sets the <see cref="Image"/> used for the artwork in this file.
+        /// </summary>
         public Image Artwork 
         {
-            get { return this.artwork; }
+            get 
+            {
+                return this.artwork; 
+            }
+
             set 
             { 
                 this.artwork = value;
@@ -101,6 +352,9 @@ namespace Knuckleball
             }
         }
 
+        /// <summary>
+        /// Reads the tags from the specified file.
+        /// </summary>
         public void ReadTags()
         {
             IntPtr fileHandle = NativeMethods.MP4Read(this.fileName);
@@ -126,7 +380,7 @@ namespace Knuckleball
             // Tags specific to TV Episodes.
             this.EpisodeNumber = tags.tvEpisode.ReadInt();
             this.SeasonNumber = tags.tvSeason.ReadInt();
-            this.EpisodeID = tags.tvEpisodeID;
+            this.EpisodeId = tags.tvEpisodeID;
             this.TVNetwork = tags.tvNetwork;
             this.TVShow = tags.tvShow;
 
@@ -154,13 +408,13 @@ namespace Knuckleball
             this.IsGapless = tags.gapless.ReadBoolean();
 
             this.MediaStoreAccount = tags.itunesAccount;
-            this.MediaStoreCountry = tags.iTunesCountry.ReadEnumValue<Country, int>(Country.NotSet);
+            this.MediaStoreCountry = tags.iTunesCountry.ReadEnumValue<Country, int>(Country.None);
             this.MediaStoreAccountType = tags.iTunesAccountType.ReadEnumValue<MediaStoreAccountKind, byte>(MediaStoreAccountKind.NotSet);
-            this.ContentID = tags.contentID.ReadInt();
-            this.ArtistID = tags.artistID.ReadInt();
-            this.PlaylistID = tags.playlistID.ReadInt();
-            this.GenreID = tags.genreID.ReadInt();
-            this.ComposerID = tags.composerID.ReadInt();
+            this.ContentId = tags.contentID.ReadInt();
+            this.ArtistId = tags.artistID.ReadInt();
+            this.PlaylistId = tags.playlistID.ReadInt();
+            this.GenreId = tags.genreID.ReadInt();
+            this.ComposerId = tags.composerID.ReadInt();
             this.Xid = tags.xid;
 
             NativeMethods.MP4TagsFree(tagPtr);
@@ -171,8 +425,27 @@ namespace Knuckleball
             NativeMethods.MP4Close(fileHandle);
         }
 
+        /// <summary>
+        /// Writes the tags to the specified file.
+        /// </summary>
         public void WriteTags()
         {
+            IntPtr fileHandle = NativeMethods.MP4Read(this.fileName);
+            NativeMethods.MP4Close(fileHandle);
+        }
+
+        private static T ReadRawAtom<T>(IntPtr fileHandle, string atomMeaning, string atomName) where T : Atom, new()
+        {
+            T atom = null;
+            IntPtr rawAtomPointer = NativeMethods.MP4ItmfGetItemsByMeaning(fileHandle, atomMeaning, atomName);
+            if (rawAtomPointer != IntPtr.Zero)
+            {   
+                // Must use this construct, as generics don't allow constructors with parameters.
+                atom = new T();
+                atom.Initialize(rawAtomPointer);
+            }
+
+            return atom;
         }
 
         private void ReadArtwork(IntPtr artworkStructurePointer)
@@ -225,8 +498,8 @@ namespace Knuckleball
             }
 
             NativeMethods.MP4TagDisk diskInfo = diskInfoPointer.ReadStructure<NativeMethods.MP4TagDisk>();
-            this.DiskNumber = diskInfo.index;
-            this.TotalDisks = diskInfo.total;
+            this.DiscNumber = diskInfo.index;
+            this.TotalDiscs = diskInfo.total;
         }
 
         private void ReadTrackInfo(IntPtr trackInfoPointer)
@@ -239,20 +512,6 @@ namespace Knuckleball
             NativeMethods.MP4TagTrack trackInfo = trackInfoPointer.ReadStructure<NativeMethods.MP4TagTrack>();
             this.TrackNumber = trackInfo.index;
             this.TotalTracks = trackInfo.total;
-        }
-
-        private T ReadRawAtom<T>(IntPtr fileHandle, string atomMeaning, string atomName) where T : Atom, new()
-        {
-            T atom = null;
-            IntPtr rawAtomPointer = NativeMethods.MP4ItmfGetItemsByMeaning(fileHandle, atomMeaning, atomName);
-            if (rawAtomPointer != IntPtr.Zero)
-            {   
-                // Must use this construct, as generics don't allow constructors with parameters.
-                atom = new T();
-                atom.Initialize(rawAtomPointer);
-            }
-
-            return atom;
         }
     }
 }
