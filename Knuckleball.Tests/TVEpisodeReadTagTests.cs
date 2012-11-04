@@ -48,9 +48,7 @@ namespace Knuckleball.Tests
         [Test]
         public void ShouldReadAlbum()
         {
-            // TODO: Fix the tags in the TV Episode file
-            // Assert.AreEqual("PuzzleQuest, Season 2", file.Album);
-            Assert.AreEqual("PuzzleQuest", file.Album);
+            Assert.AreEqual("PuzzleQuest, Season 2", file.Album);
         }
 
         [Test]
@@ -182,8 +180,8 @@ namespace Knuckleball.Tests
         [Test]
         public void ShouldReadArtwork()
         {
-            Assert.AreEqual(file.ArtworkFormat, ImageFormat.Png);
-            Assert.AreEqual("c1b2758c370db440aa48ff3a7519ff24", ComputeHash(file.Artwork, file.ArtworkFormat));
+            Assert.AreEqual(ImageFormat.Jpeg, file.ArtworkFormat);
+            Assert.AreEqual("5527201a6235d454c7e7f724e803e700", ComputeHash(file.Artwork, file.ArtworkFormat));
         }
 
         [Test]
@@ -225,7 +223,7 @@ namespace Knuckleball.Tests
         [Test]
         public void ShouldReadIsHDVideo()
         {
-            Assert.IsNull(file.IsHDVideo);
+            Assert.IsFalse(file.IsHDVideo.Value);
         }
 
         [Test]
@@ -267,7 +265,7 @@ namespace Knuckleball.Tests
         [Test]
         public void ShouldReadContentId()
         {
-            Assert.IsNull(file.ContentId);
+            Assert.AreEqual(0, file.ContentId.Value);
         }
         
         [Test]
@@ -355,11 +353,9 @@ namespace Knuckleball.Tests
         private string ComputeHash(Image image, ImageFormat format)
         {
             byte[] buffer;
-            using (MemoryStream stream = new MemoryStream())
-            {
-                image.Save(stream, format);
-                buffer = stream.ToArray();
-            }
+            MemoryStream stream = new MemoryStream();
+            image.Save(stream, format);
+            buffer = stream.ToArray();
 
             MD5 md5 = MD5.Create();
             byte[] hash = md5.ComputeHash(buffer);
