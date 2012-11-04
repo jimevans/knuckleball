@@ -30,6 +30,7 @@ namespace Knuckleball
     public class MP4File
     {
         private string fileName;
+        private Stream artworkStream;
         private Image artwork;
 
         /// <summary>
@@ -430,7 +431,17 @@ namespace Knuckleball
         /// </summary>
         public void WriteTags()
         {
-            IntPtr fileHandle = NativeMethods.MP4Read(this.fileName);
+            IntPtr fileHandle = NativeMethods.MP4Modify(this.fileName, 0);
+            IntPtr tagsPtr = NativeMethods.MP4TagsAlloc();
+            bool retVal = NativeMethods.MP4TagsFetch(tagsPtr, fileHandle);
+            NativeMethods.MP4Tags tags = tagsPtr.ReadStructure<NativeMethods.MP4Tags>();
+            if (this.Title != tags.name)
+            {
+                retVal = NativeMethods.MP4TagsSetName(tagsPtr, this.Title);
+            }
+
+            retVal = NativeMethods.MP4TagsStore(tagsPtr, fileHandle);
+            NativeMethods.MP4TagsFree(tagsPtr);
             NativeMethods.MP4Close(fileHandle);
         }
 
@@ -458,11 +469,8 @@ namespace Knuckleball
             NativeMethods.MP4TagArtwork artwork = artworkStructurePointer.ReadStructure<NativeMethods.MP4TagArtwork>();
             byte[] artworkBuffer = new byte[artwork.size];
             Marshal.Copy(artwork.data, artworkBuffer, 0, artwork.size);
-            Image artworkImage;
-            using (MemoryStream imageStream = new MemoryStream(artworkBuffer))
-            {
-                artworkImage = Image.FromStream(imageStream);
-            }
+            this.artworkStream = new MemoryStream(artworkBuffer);
+            this.artwork = Image.FromStream(artworkStream);
 
             switch (artwork.type)
             {
@@ -486,8 +494,6 @@ namespace Knuckleball
                     this.ArtworkFormat = ImageFormat.MemoryBmp;
                     break;
             }
-
-            this.artwork = artworkImage;
         }
 
         private void ReadDiskInfo(IntPtr diskInfoPointer)
