@@ -13,6 +13,7 @@ using NUnit.Framework;
 using System.Security.Cryptography;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Reflection;
 
 namespace Knuckleball.Tests
 {
@@ -41,339 +42,500 @@ namespace Knuckleball.Tests
             this.file.ReadTags();
         }
 
+        private void RunSetValueTest(string propertyName, object expectedPropertyValue)
+        {
+            // We're going to use reflection to test setting of properties, so that
+            // we can avoid massive amounts of duplicated code. The reflection code
+            // below is equivalent of running the below code with ".PropertyName"
+            // replaced by the actual property name.
+            //
+            // this.file.PropertyName = expectedPropertyValue;
+            // this.file.WriteTags();
+            // this.file = new MP4File(fileCopy);
+            // this.file.ReadTags();
+            // if (expectedPropertyValue == null)
+            // {
+            //     Assert.IsNull(this.file.PropertyName);
+            // }
+            // else
+            // {
+            //     Assert.AreEqual(expectedPropertyValue, this.file.PropertyName);
+            // }
+            PropertyInfo propInfo = this.file.GetType().GetProperty(propertyName);
+            if (propInfo == null)
+            {
+                throw new InvalidOperationException("No property on the object with the name " + propertyName);
+            }
+
+            object originalValue = propInfo.GetValue(this.file, null);
+            propInfo.SetValue(this.file, expectedPropertyValue, null);
+
+            this.file.WriteTags();
+
+            this.file = new MP4File(this.fileCopy);
+            this.file.ReadTags();
+            propInfo = this.file.GetType().GetProperty(propertyName);
+            if (expectedPropertyValue == null)
+            {
+                Assert.IsNull(propInfo.GetValue(this.file, null));
+            }
+            else
+            {
+                Assert.AreEqual(expectedPropertyValue, propInfo.GetValue(this.file, null));
+            }
+        }
+
         [Test]
         public void ShouldWriteTitle()
         {
-            this.file.Title = "My New Title";
-            this.file.WriteTags();
+            RunSetValueTest("Title", "My New Title");
 
-            this.file = new MP4File(fileCopy);
-            this.file.ReadTags();
-            Assert.AreEqual("My New Title", this.file.Title);
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("Title", null);
         }
 
         [Test]
-        public void ShouldWriteNullTitle()
+        public void ShouldWriteArtist()
         {
-            this.file.Title = null;
-            this.file.WriteTags();
+            RunSetValueTest("Artist", "My New Artist");
 
-            this.file = new MP4File(fileCopy);
-            this.file.ReadTags();
-            Assert.IsNull(this.file.Title);
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("Artist", null);
         }
 
         [Test]
-        public void ShouldReadArtist()
+        public void ShouldWriteAlbum()
         {
-            Assert.AreEqual("PuzzleQuest", file.Artist);
+            RunSetValueTest("Album", "My New Album");
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("Album", null);
         }
 
         [Test]
-        public void ShouldReadAlbum()
+        public void ShouldWriteAlbumArtist()
         {
-            // TODO: Fix the tags in the TV Episode file
-            // Assert.AreEqual("PuzzleQuest, Season 2", file.Album);
-            Assert.AreEqual("PuzzleQuest", file.Album);
+            RunSetValueTest("AlbumArtist", "My New Album Artist");
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("AlbumArtist", null);
         }
 
         [Test]
-        public void ShouldReadAlbumArtist()
+        public void ShouldWriteGrouping()
         {
-            Assert.AreEqual("PuzzleQuest", file.AlbumArtist);
+            RunSetValueTest("Grouping", "My New Grouping");
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("Grouping", null);
         }
 
         [Test]
-        public void ShouldReadGrouping()
+        public void ShouldWriteComposer()
         {
-            Assert.IsNull(file.Grouping);
+            RunSetValueTest("Composer", "My New Composer");
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("Composer", null);
         }
 
         [Test]
-        public void ShouldReadComposer()
+        public void ShouldWriteComment()
         {
-            Assert.IsNull(file.Composer);
+            RunSetValueTest("Comment", "My New Comment");
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("Comment", null);
         }
 
         [Test]
-        public void ShouldReadComment()
+        public void ShouldWriteGenre()
         {
-            Assert.IsNull(file.Comment);
+            RunSetValueTest("Genre", "My New Genre");
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("Genre", null);
         }
 
         [Test]
-        public void ShouldReadGenre()
+        public void ShouldWriteTrackNumber()
         {
-            Assert.AreEqual("Drama", file.Genre);
+            RunSetValueTest("TrackNumber", 5);
+
+            // Test that we can write a null value to the tag too.
+            // Note: setting TrackNumber to null implies TotalTracks is also null.
+            RunSetValueTest("TrackNumber", null);
+            Assert.IsNull(this.file.TotalTracks);
         }
 
         [Test]
-        public void ShouldReadTrackNumber()
+        public void ShouldWriteTotalTracks()
         {
-            Assert.AreEqual(3, file.TrackNumber);
+            RunSetValueTest("TotalTracks", 5);
+
+            // Test that we can write a null value to the tag too.
+            // Note: setting TotalTracks to null implies TrackNumber is also null.
+            RunSetValueTest("TotalTracks", null);
+            Assert.IsNull(this.file.TrackNumber);
         }
 
         [Test]
-        public void ShouldReadTotalTracks()
+        public void ShouldWriteDiscNumber()
         {
-            Assert.AreEqual(0, file.TotalTracks);
+            RunSetValueTest("DiscNumber", 2);
+
+            // Test that we can write a null value to the tag too.
+            // Note: setting DiscNumber to null implies TotalDiscs is also null.
+            RunSetValueTest("DiscNumber", null);
+            Assert.IsNull(this.file.TotalDiscs);
         }
 
         [Test]
-        public void ShouldReadDiskNumber()
+        public void ShouldWriteTotalDiscs()
         {
-            Assert.AreEqual(1, file.DiscNumber);
+            RunSetValueTest("TotalDiscs", 2);
+
+            // Test that we can write a null value to the tag too.
+            // Note: setting TotalDiscs to null implies DiscNumber is also null.
+            RunSetValueTest("TotalDiscs", null);
+            Assert.IsNull(this.file.DiscNumber);
         }
 
         [Test]
-        public void ShouldReadTotalDisks()
+        public void ShouldWriteTempo()
         {
-            Assert.AreEqual(1, file.TotalDiscs);
+            RunSetValueTest("Tempo", 120);
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("Tempo", null);
         }
 
         [Test]
-        public void ShouldReadTempo()
+        public void ShouldWriteIsCompilation()
         {
-            Assert.IsNull(file.Tempo);
+            // TODO: Boolean properties will require special handling.
+            Assert.Fail("Test not yet implemented");
         }
 
         [Test]
-        public void ShouldReadIsCompilation()
+        public void ShouldWriteDescription()
         {
-            Assert.IsFalse(file.IsCompilation.Value);
+            RunSetValueTest("Description", "My New Description");
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("Description", null);
         }
 
         [Test]
-        public void ShouldReadDescription()
+        public void ShouldWriteLongDescription()
         {
-            Assert.AreEqual("The PuzzleMaster returns to show the world he was not defeated.", file.Description);
+            RunSetValueTest("LongDescription", "My New Long Description");
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("LongDescription", null);
         }
 
         [Test]
-        public void ShouldReadLongDescription()
+        public void ShouldWriteLyrics()
         {
-            Assert.AreEqual("The PuzzleMaster returns to show the world he was not defeated. Planning new diabolical puzzles for the user to find, He has kidnapped the beloved Jimmy Bear.", file.LongDescription);
+            RunSetValueTest("Lyrics", "My New Lyrics");
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("Lyrics", null);
         }
 
         [Test]
-        public void ShouldReadLyrics()
+        public void ShouldWriteSortName()
         {
-            Assert.IsNull(file.Lyrics);
+            RunSetValueTest("SortName", "My New Sort Name");
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("SortName", null);
         }
 
         [Test]
-        public void ShouldReadSortName()
+        public void ShouldWriteSortArtist()
         {
-            Assert.AreEqual("PuzzleMaster Strikes Back", file.SortName);
+            RunSetValueTest("SortArtist", "My New Sort artist");
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("SortArtist", null);
         }
 
         [Test]
-        public void ShouldReadSortArtist()
+        public void ShouldWriteSortAlbum()
         {
-            Assert.IsNull(file.SortArtist);
+            RunSetValueTest("SortAlbum", "My New Sort Album");
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("SortAlbum", null);
         }
 
         [Test]
-        public void ShouldReadSortAlbum()
+        public void ShouldWriteSortAlbumArtist()
         {
-            Assert.AreEqual("PuzzleQuest, Season 2", file.SortAlbum);
+            RunSetValueTest("SortAlbumArtist", "My New Sort Album Artist");
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("SortAlbumArtist", null);
         }
 
         [Test]
-        public void ShouldReadSortAlbumArtist()
+        public void ShouldWriteSortComposer()
         {
-            Assert.IsNull(file.SortAlbumArtist);
+            RunSetValueTest("SortComposer", "My New Sort Composer");
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("SortComposer", null);
         }
 
         [Test]
-        public void ShouldReadSortComposer()
+        public void ShouldWriteSortTVShow()
         {
-            Assert.IsNull(file.SortComposer);
+            RunSetValueTest("SortTVShow", "My New Sort TV Show");
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("SortTVShow", null);
         }
 
         [Test]
-        public void ShouldReadSortTVShow()
+        public void ShouldWriteArtworkCount()
         {
-            Assert.IsNull(file.SortTVShow);
+            // TODO: Artwork properties will require special handling.
+            Assert.Fail("Test not yet implemented");
         }
 
         [Test]
-        public void ShouldReadArtworkCount()
+        public void ShouldWriteArtwork()
         {
-            Assert.AreEqual(1, file.ArtworkCount);
+            // TODO: Artwork properties will require special handling.
+            Assert.Fail("Test not yet implemented");
         }
 
         [Test]
-        public void ShouldReadArtwork()
+        public void ShouldWriteCopyright()
         {
-            Assert.AreEqual(file.ArtworkFormat, ImageFormat.Png);
-            Assert.AreEqual("c1b2758c370db440aa48ff3a7519ff24", ComputeHash(file.Artwork, file.ArtworkFormat));
+            RunSetValueTest("Copyright", "My New copyright notice");
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("Copyright", null);
         }
 
         [Test]
-        public void ShouldReadCopyright()
+        public void ShouldWriteEncodingTool()
         {
-            Assert.IsNull(file.Copyright);
+            RunSetValueTest("EncodingTool", "My New Encoding Tool");
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("EncodingTool", null);
         }
 
         [Test]
-        public void ShouldReadEncodingTool()
+        public void ShouldWriteEncodedBy()
         {
-            Assert.AreEqual("HandBrake 0.9.3 2008112300", file.EncodingTool);
+            RunSetValueTest("EncodedBy", "My New Encoded By");
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("EncodedBy", null);
         }
 
         [Test]
-        public void ShouldReadEncodedBy()
+        public void ShouldWriteIsPodcast()
         {
-            Assert.IsNull(file.EncodedBy);
+            // TODO: Boolean properties will require special handling.
+            Assert.Fail("Test not yet implemented");
         }
 
         [Test]
-        public void ShouldReadIsPodcast()
+        public void ShouldWriteKeywords()
         {
-            Assert.IsNull(file.IsPodcast);
+            RunSetValueTest("Keywords", "My New Keywords");
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("Keywords", null);
         }
 
         [Test]
-        public void ShouldReadKeywords()
+        public void ShouldWriteCategory()
         {
-            Assert.IsNull(file.Keywords);
+            RunSetValueTest("Category", "My New Category");
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("Category", null);
         }
 
         [Test]
-        public void ShouldReadCategory()
+        public void ShouldWriteIsHDVideo()
         {
-            Assert.IsNull(file.Category);
+            // TODO: Boolean properties will require special handling.
+            Assert.Fail("Test not yet implemented");
         }
 
         [Test]
-        public void ShouldReadIsHDVideo()
+        public void ShouldWriteMediaType()
         {
-            Assert.IsNull(file.IsHDVideo);
+            RunSetValueTest("MediaType", MediaKind.Movie);
+
+            // Test that we can write an "unset" value to the tag too.
+            RunSetValueTest("MediaType", MediaKind.NotSet);
         }
 
         [Test]
-        public void ShouldReadMediaType()
+        public void ShouldWriteContentRating()
         {
-            Assert.AreEqual(MediaKind.TVShow, file.MediaType);
+            RunSetValueTest("ContentRating", ContentRating.Explicit);
+
+            // Test that we can write an "unset" value to the tag too.
+            RunSetValueTest("ContentRating", ContentRating.NotSet);
         }
 
         [Test]
-        public void ShouldReadContentRating()
+        public void ShouldWriteIsGapless()
         {
-            Assert.AreEqual(ContentRating.NotSet, file.ContentRating);
-        }
-
-        [Test]
-        public void ShouldReadIsGapless()
-        {
-            Assert.False(file.IsGapless.Value);
+            // TODO: Boolean properties will require special handling.
+            Assert.Fail("Test not yet implemented");
         }
         
         [Test]
-        public void ShouldReadMediaStoreAccount()
+        public void ShouldWriteMediaStoreAccount()
         {
-            Assert.IsNull(file.MediaStoreAccount);
+            RunSetValueTest("MediaStoreAccount", "My New Media store account");
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("MediaStoreAccount", null);
         }
         
         [Test]
-        public void ShouldReadMediaStoreAccountType()
+        public void ShouldWriteMediaStoreAccountType()
         {
-            Assert.AreEqual(MediaStoreAccountKind.NotSet, file.MediaStoreAccountType);
+            RunSetValueTest("MediaStoreAccountType", MediaStoreAccountKind.iTunes);
+
+            // Test that we can write an "unset" value to the tag too.
+            RunSetValueTest("MediaStoreAccountType", MediaStoreAccountKind.NotSet);
         }
         
         [Test]
-        public void ShouldReadMediaStoreCountry()
+        public void ShouldWriteMediaStoreCountry()
         {
-            Assert.AreEqual(Country.None, file.MediaStoreCountry);
+            RunSetValueTest("MediaStoreCountry", Country.UnitedKingdom);
+
+            // Test that we can write an "unset" value to the tag too.
+            RunSetValueTest("MediaStoreCountry", Country.None);
         }
         
         [Test]
-        public void ShouldReadContentId()
+        public void ShouldWriteContentId()
         {
-            Assert.IsNull(file.ContentId);
+            RunSetValueTest("ContentId", 120);
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("ContentId", null);
         }
         
         [Test]
-        public void ShouldReadArtistId()
+        public void ShouldWriteArtistId()
         {
-            Assert.IsNull(file.ArtistId);
+            RunSetValueTest("ArtistId", 120);
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("ArtistId", null);
         }
         
         [Test]
-        public void ShouldReadPlaylistId()
+        public void ShouldWritePlaylistId()
         {
-            Assert.IsNull(file.PlaylistId);
+            RunSetValueTest("PlaylistId", 120);
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("PlaylistId", null);
         }
         
         [Test]
-        public void ShouldReadGenreId()
+        public void ShouldWriteGenreId()
         {
-            Assert.IsNull(file.GenreId);
+            RunSetValueTest("GenreId", 120);
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("GenreId", null);
         }
         
         [Test]
-        public void ShouldReadComposerId()
+        public void ShouldWriteComposerId()
         {
-            Assert.IsNull(file.ComposerId);
+            RunSetValueTest("ComposerId", 120);
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("ComposerId", null);
         }
         
         [Test]
-        public void ShouldReadXid()
+        public void ShouldWriteXid()
         {
-            Assert.IsNull(file.Xid);
+            RunSetValueTest("Xid", "My New Xid");
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("Xid", null);
         }
 
         [Test]
-        public void ShouldReadRatingInfo()
+        public void ShouldWriteRatingInfo()
         {
-            Assert.AreEqual("us-tv", file.RatingInfo.RatingSource);
-            Assert.AreEqual("TV-14", file.RatingInfo.Rating);
-            Assert.AreEqual(500, file.RatingInfo.SortValue);
-            Assert.IsNullOrEmpty(file.RatingInfo.RatingAnnotation);
-            Assert.AreEqual("us-tv|TV-14|500|", file.RatingInfo.ToString());
+            // TODO: Raw atom properties will require special handling.
+            Assert.Fail("Test not yet implemented");
         }
 
         [Test]
-        public void ShouldReadMovieInfo()
+        public void ShouldWriteMovieInfo()
         {
-            Assert.IsNull(file.MovieInfo.Cast);
-            Assert.IsNull(file.MovieInfo.Directors);
-            Assert.IsNull(file.MovieInfo.Producers);
-            Assert.IsNull(file.MovieInfo.Screenwriters);
-            Assert.IsNull(file.MovieInfo.Studio);
+            // TODO: Raw atom properties will require special handling.
+            Assert.Fail("Test not yet implemented");
         }
 
         // The following are tags unique to TV Episodes
 
         [Test]
-        public void ShouldReadEpisodeNumber()
+        public void ShouldWriteEpisodeNumber()
         {
-            Assert.AreEqual(3, file.EpisodeNumber);
+            RunSetValueTest("EpisodeNumber", 23);
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("EpisodeNumber", null);
         }
 
         [Test]
-        public void ShouldReadSeasonNumber()
+        public void ShouldWriteSeasonNumber()
         {
-            Assert.AreEqual(2, file.SeasonNumber);
+            RunSetValueTest("SeasonNumber", 4);
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("SeasonNumber", null);
         }
 
         [Test]
-        public void ShouldReadEpisodeId()
+        public void ShouldWriteEpisodeId()
         {
-            Assert.AreEqual("PQS2E3", file.EpisodeId);
+            RunSetValueTest("EpisodeId", "My New Episode ID");
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("EpisodeId", null);
         }
 
         [Test]
-        public void ShouldReadTVShow()
+        public void ShouldWriteTVShow()
         {
-            Assert.AreEqual("PuzzleQuest", file.TVShow);
+            RunSetValueTest("TVShow", "My New TV Show");
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("TVShow", null);
         }
 
         [Test]
-        public void ShouldReadTVNetwork()
+        public void ShouldWriteTVNetwork()
         {
-            Assert.IsNull(file.TVNetwork);
+            RunSetValueTest("TVNetwork", "My New TV Network");
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("TVNetwork", null);
         }
 
         private string ComputeHash(Image image, ImageFormat format)
