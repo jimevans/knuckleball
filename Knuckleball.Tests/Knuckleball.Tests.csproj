@@ -85,6 +85,9 @@
     <Content Include="TestFiles\Movie.m4v">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="TestFiles\NewArtwork.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="TestFiles\TVEpisode.m4v">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

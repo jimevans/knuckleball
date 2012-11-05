@@ -32,6 +32,7 @@ namespace Knuckleball
         private string fileName;
         private Stream artworkStream;
         private Image artwork;
+        private bool isArtworkEdited;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MP4File"/> class for the specified file.
@@ -206,9 +207,9 @@ namespace Knuckleball
         public string SortTVShow { get; set; }
         
         /// <summary>
-        /// Gets or sets the count of the artwork contained in this file.
+        /// Gets the count of the artwork contained in this file.
         /// </summary>
-        public int ArtworkCount { get; set; }
+        public int ArtworkCount { get; private set; }
         
         /// <summary>
         /// Gets the format of the artwork contained in this file.
@@ -349,7 +350,16 @@ namespace Knuckleball
             set 
             { 
                 this.artwork = value;
-                this.ArtworkFormat = value.RawFormat;
+                if (value != null)
+                {
+                    this.ArtworkFormat = value.RawFormat;
+                }
+                else
+                {
+                    this.ArtworkFormat = null;
+                }
+
+                this.isArtworkEdited = true;
             }
         }
 
@@ -672,6 +682,21 @@ namespace Knuckleball
             WriteTrackInfo(tagsPtr, tags.track);
             WriteDiscInfo(tagsPtr, tags.disk);
 
+            // If the artwork has been edited, there are two possibilities:
+            // First we are replacing an existing piece of artwork with another; or
+            // second, we are deleting the artwork that already existed.
+            if (this.isArtworkEdited)
+            {
+                if (this.artwork != null)
+                {
+                    WriteArtwork(tagsPtr);
+                }
+                else if (this.ArtworkCount != 0)
+                {
+                    NativeMethods.MP4TagsRemoveArtwork(tagsPtr, 0);
+                }
+            }
+
             retVal = NativeMethods.MP4TagsStore(tagsPtr, fileHandle);
             NativeMethods.MP4TagsFree(tagsPtr);
             NativeMethods.MP4Close(fileHandle);
@@ -804,6 +829,54 @@ namespace Knuckleball
             }
         }
 
+        private void WriteArtwork(IntPtr tagsPtr)
+        {
+            NativeMethods.MP4TagArtwork newArtwork = new NativeMethods.MP4TagArtwork();
+
+            MemoryStream stream = new MemoryStream();
+            this.artwork.Save(stream, this.ArtworkFormat);
+            byte[] artworkBytes = stream.ToArray();
+
+            newArtwork.data = Marshal.AllocHGlobal(artworkBytes.Length);
+            newArtwork.size = artworkBytes.Length;
+            Marshal.Copy(artworkBytes, 0, newArtwork.data, artworkBytes.Length);
+
+            if (this.ArtworkFormat.Equals(ImageFormat.Bmp))
+            {
+                newArtwork.type = NativeMethods.ArtworkType.Bmp;
+            }
+            else if (this.ArtworkFormat.Equals(ImageFormat.Jpeg))
+            {
+                newArtwork.type = NativeMethods.ArtworkType.Jpeg;
+            }
+            else if (this.ArtworkFormat.Equals(ImageFormat.Gif))
+            {
+                newArtwork.type = NativeMethods.ArtworkType.Gif;
+            }
+            else if (this.ArtworkFormat.Equals(ImageFormat.Png))
+            {
+                newArtwork.type = NativeMethods.ArtworkType.Png;
+            }
+            else
+            {
+                newArtwork.type = NativeMethods.ArtworkType.Undefined;
+            }
+
+            IntPtr newArtworkPtr = Marshal.AllocHGlobal(Marshal.SizeOf(newArtwork));
+            Marshal.StructureToPtr(newArtwork, newArtworkPtr, false);
+            if (this.ArtworkCount == 0)
+            {
+                bool result = NativeMethods.MP4TagsAddArtwork(tagsPtr, newArtworkPtr);
+            }
+            else
+            {
+                bool result = NativeMethods.MP4TagsSetArtwork(tagsPtr, 0, newArtworkPtr);
+            }
+
+            Marshal.FreeHGlobal(newArtwork.data);
+            Marshal.FreeHGlobal(newArtworkPtr);
+        }
+
         private void ReadDiskInfo(IntPtr diskInfoPointer)
         {
             if (diskInfoPointer == IntPtr.Zero)
@@ -814,6 +887,27 @@ namespace Knuckleball
             NativeMethods.MP4TagDisk diskInfo = diskInfoPointer.ReadStructure<NativeMethods.MP4TagDisk>();
             this.DiscNumber = diskInfo.index;
             this.TotalDiscs = diskInfo.total;
+        }
+
+        private void WriteDiscInfo(IntPtr tagsPtr, IntPtr discInfoPtr)
+        {
+            if (this.DiscNumber == null || this.TotalDiscs == null)
+            {
+                NativeMethods.MP4TagsSetDisk(tagsPtr, IntPtr.Zero);
+            }
+            else
+            {
+                NativeMethods.MP4TagDisk discInfo = discInfoPtr.ReadStructure<NativeMethods.MP4TagDisk>();
+                if (this.DiscNumber.Value != discInfo.index || this.TotalDiscs != discInfo.total)
+                {
+                    discInfo.index = this.DiscNumber.Value;
+                    discInfo.total = this.TotalDiscs.Value;
+                    IntPtr discPtr = Marshal.AllocHGlobal(Marshal.SizeOf(discInfo));
+                    Marshal.StructureToPtr(discInfo, discPtr, false);
+                    NativeMethods.MP4TagsSetDisk(tagsPtr, discPtr);
+                    Marshal.FreeHGlobal(discPtr);
+                }
+            }
         }
 
         private void ReadTrackInfo(IntPtr trackInfoPointer)
@@ -845,27 +939,6 @@ namespace Knuckleball
                     Marshal.StructureToPtr(trackInfo, trackPtr, false);
                     NativeMethods.MP4TagsSetTrack(tagsPtr, trackPtr);
                     Marshal.FreeHGlobal(trackPtr);
-                }
-            }
-        }
-
-        private void WriteDiscInfo(IntPtr tagsPtr, IntPtr discInfoPtr)
-        {
-            if (this.DiscNumber == null || this.TotalDiscs == null)
-            {
-                NativeMethods.MP4TagsSetDisk(tagsPtr, IntPtr.Zero);
-            }
-            else
-            {
-                NativeMethods.MP4TagDisk discInfo = discInfoPtr.ReadStructure<NativeMethods.MP4TagDisk>();
-                if (this.DiscNumber.Value != discInfo.index || this.TotalDiscs != discInfo.total)
-                {
-                    discInfo.index = this.DiscNumber.Value;
-                    discInfo.total = this.TotalDiscs.Value;
-                    IntPtr discPtr = Marshal.AllocHGlobal(Marshal.SizeOf(discInfo));
-                    Marshal.StructureToPtr(discInfo, discPtr, false);
-                    NativeMethods.MP4TagsSetDisk(tagsPtr, discPtr);
-                    Marshal.FreeHGlobal(discPtr);
                 }
             }
         }

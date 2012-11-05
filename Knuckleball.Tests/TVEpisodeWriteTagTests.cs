@@ -327,17 +327,21 @@ namespace Knuckleball.Tests
         }
 
         [Test]
-        public void ShouldWriteArtworkCount()
-        {
-            // TODO: Artwork properties will require special handling.
-            Assert.Fail("Test not yet implemented");
-        }
-
-        [Test]
         public void ShouldWriteArtwork()
         {
-            // TODO: Artwork properties will require special handling.
-            Assert.Fail("Test not yet implemented");
+            Image newArtwork = Image.FromFile(Path.Combine(TestFileUtilities.GetTestFileDirectory(), "NewArtwork.png"));
+            this.file.Artwork = newArtwork;
+            this.file.WriteTags();
+
+            this.file.ReadTags();
+            Assert.AreEqual(1, this.file.ArtworkCount);
+            Assert.AreEqual("577f318762da53a41aa57d43ba6480ea", this.ComputeHash(this.file.Artwork, this.file.ArtworkFormat));
+
+            this.file.Artwork = null;
+            this.file.WriteTags();
+            this.file.ReadTags();
+            Assert.AreEqual(0, this.file.ArtworkCount);
+            Assert.IsNull(this.file.Artwork);
         }
 
         [Test]

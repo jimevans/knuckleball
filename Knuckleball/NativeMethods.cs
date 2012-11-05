@@ -240,11 +240,11 @@ namespace Knuckleball
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool MP4TagsAddArtwork(IntPtr tags, ref MP4TagArtwork artwork);
+        public static extern bool MP4TagsAddArtwork(IntPtr tags, IntPtr artwork);
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool MP4TagsSetArtwork(IntPtr tags, int index, ref MP4TagArtwork artwork);
+        public static extern bool MP4TagsSetArtwork(IntPtr tags, int index, IntPtr artwork);
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
