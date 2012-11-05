@@ -160,7 +160,7 @@ namespace Knuckleball
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool MP4TagsSetGenreType(IntPtr tags, ref short genreType);
+        public static extern bool MP4TagsSetGenreType(IntPtr tags, IntPtr genreType);
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
@@ -168,19 +168,19 @@ namespace Knuckleball
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool MP4TagsSetTrack(IntPtr tags, ref MP4TagTrack trackInfo);
+        public static extern bool MP4TagsSetTrack(IntPtr tags, IntPtr trackInfo);
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool MP4TagsSetDisk(IntPtr tags, ref MP4TagDisk discInfo);
+        public static extern bool MP4TagsSetDisk(IntPtr tags, IntPtr discInfo);
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool MP4TagsSetTempo(IntPtr tags, ref short tempo);
+        public static extern bool MP4TagsSetTempo(IntPtr tags, IntPtr tempo);
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool MP4TagsSetCompilation(IntPtr tags, ref byte isCompilation);
+        public static extern bool MP4TagsSetCompilation(IntPtr tags, IntPtr isCompilation);
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
@@ -196,11 +196,11 @@ namespace Knuckleball
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool MP4TagsSetTVSeason(IntPtr tags, ref int seasonNumber);
+        public static extern bool MP4TagsSetTVSeason(IntPtr tags, IntPtr seasonNumber);
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool MP4TagsSetTVEpisode(IntPtr tags, ref int episodeNumber);
+        public static extern bool MP4TagsSetTVEpisode(IntPtr tags, IntPtr episodeNumber);
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
@@ -268,7 +268,7 @@ namespace Knuckleball
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool MP4TagsSetPodcast(IntPtr tags, ref byte isPodcast);
+        public static extern bool MP4TagsSetPodcast(IntPtr tags, IntPtr isPodcast);
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
@@ -280,19 +280,19 @@ namespace Knuckleball
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool MP4TagsSetHDVideo(IntPtr tags, ref byte isHDVideo);
+        public static extern bool MP4TagsSetHDVideo(IntPtr tags, IntPtr isHDVideo);
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool MP4TagsSetMediaType(IntPtr tags, ref byte mediaType);
+        public static extern bool MP4TagsSetMediaType(IntPtr tags, IntPtr mediaType);
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool MP4TagsSetContentRating(IntPtr tags, ref byte contentRating);
+        public static extern bool MP4TagsSetContentRating(IntPtr tags, IntPtr contentRating);
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool MP4TagsSetGapless(IntPtr tags, ref byte isGapless);
+        public static extern bool MP4TagsSetGapless(IntPtr tags, IntPtr isGapless);
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
@@ -300,31 +300,31 @@ namespace Knuckleball
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool MP4TagsSetITunesAccountType(IntPtr tags, ref byte iTunesAccountType);
+        public static extern bool MP4TagsSetITunesAccountType(IntPtr tags, IntPtr iTunesAccountType);
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool MP4TagsSetITunesCountry(IntPtr tags, ref int iTunesAccountCountry);
+        public static extern bool MP4TagsSetITunesCountry(IntPtr tags, IntPtr iTunesAccountCountry);
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool MP4TagsSetContentID(IntPtr tags, ref int contentId);
+        public static extern bool MP4TagsSetContentID(IntPtr tags, IntPtr contentId);
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool MP4TagsSetArtistID(IntPtr tags, ref int artistId);
+        public static extern bool MP4TagsSetArtistID(IntPtr tags, IntPtr artistId);
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool MP4TagsSetPlaylistID(IntPtr tags, ref long playlistId);
+        public static extern bool MP4TagsSetPlaylistID(IntPtr tags, IntPtr playlistId);
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool MP4TagsSetGenreID(IntPtr tags, ref int genreId);
+        public static extern bool MP4TagsSetGenreID(IntPtr tags, IntPtr genreId);
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool MP4TagsSetComposerID(IntPtr tags, ref int composerId);
+        public static extern bool MP4TagsSetComposerID(IntPtr tags, IntPtr composerId);
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]

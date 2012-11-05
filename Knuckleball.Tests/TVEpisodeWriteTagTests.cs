@@ -29,6 +29,11 @@ namespace Knuckleball.Tests
         [TestFixtureSetUp]
         public void SetUp()
         {
+            CopyNewTestFile();
+        }
+
+        private void CopyNewTestFile()
+        {
             string directory = TestFileUtilities.GetTestFileDirectory();
             string fileName = Path.Combine(directory, "TVEpisode.m4v");
             this.fileCopy = Path.Combine(directory, "TVEpisodeCopy.m4v");
@@ -160,7 +165,11 @@ namespace Knuckleball.Tests
         [Test]
         public void ShouldWriteTrackNumber()
         {
-            RunSetValueTest("TrackNumber", 5);
+            this.CopyNewTestFile();
+            this.Read();
+
+            short? track = 5;
+            RunSetValueTest("TrackNumber", track);
 
             // Test that we can write a null value to the tag too.
             // Note: setting TrackNumber to null implies TotalTracks is also null.
@@ -171,7 +180,11 @@ namespace Knuckleball.Tests
         [Test]
         public void ShouldWriteTotalTracks()
         {
-            RunSetValueTest("TotalTracks", 5);
+            this.CopyNewTestFile();
+            this.Read();
+
+            short? track = 12;
+            RunSetValueTest("TotalTracks", track);
 
             // Test that we can write a null value to the tag too.
             // Note: setting TotalTracks to null implies TrackNumber is also null.
@@ -182,7 +195,11 @@ namespace Knuckleball.Tests
         [Test]
         public void ShouldWriteDiscNumber()
         {
-            RunSetValueTest("DiscNumber", 2);
+            this.CopyNewTestFile();
+            this.Read();
+
+            short? discNumber = 2;
+            RunSetValueTest("DiscNumber", discNumber);
 
             // Test that we can write a null value to the tag too.
             // Note: setting DiscNumber to null implies TotalDiscs is also null.
@@ -193,7 +210,11 @@ namespace Knuckleball.Tests
         [Test]
         public void ShouldWriteTotalDiscs()
         {
-            RunSetValueTest("TotalDiscs", 2);
+            this.CopyNewTestFile();
+            this.Read();
+
+            short? totalDiscs = 2;
+            RunSetValueTest("TotalDiscs", totalDiscs);
 
             // Test that we can write a null value to the tag too.
             // Note: setting TotalDiscs to null implies DiscNumber is also null.
@@ -204,7 +225,8 @@ namespace Knuckleball.Tests
         [Test]
         public void ShouldWriteTempo()
         {
-            RunSetValueTest("Tempo", 120);
+            short? tempo = 120;
+            RunSetValueTest("Tempo", tempo);
 
             // Test that we can write a null value to the tag too.
             RunSetValueTest("Tempo", null);
@@ -213,8 +235,14 @@ namespace Knuckleball.Tests
         [Test]
         public void ShouldWriteIsCompilation()
         {
-            // TODO: Boolean properties will require special handling.
-            Assert.Fail("Test not yet implemented");
+            bool? compilationValue = true;
+            RunSetValueTest("IsCompilation", compilationValue);
+
+            compilationValue = false;
+            RunSetValueTest("IsCompilation", compilationValue);
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("IsCompilation", null);
         }
 
         [Test]
@@ -342,8 +370,14 @@ namespace Knuckleball.Tests
         [Test]
         public void ShouldWriteIsPodcast()
         {
-            // TODO: Boolean properties will require special handling.
-            Assert.Fail("Test not yet implemented");
+            bool? podcastValue = true;
+            RunSetValueTest("IsPodcast", podcastValue);
+
+            podcastValue = false;
+            RunSetValueTest("IsPodcast", podcastValue);
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("IsPodcast", null);
         }
 
         [Test]
@@ -367,8 +401,14 @@ namespace Knuckleball.Tests
         [Test]
         public void ShouldWriteIsHDVideo()
         {
-            // TODO: Boolean properties will require special handling.
-            Assert.Fail("Test not yet implemented");
+            bool? hdVideoValue = true;
+            RunSetValueTest("IsHDVideo", hdVideoValue);
+
+            hdVideoValue = false;
+            RunSetValueTest("IsHDVideo", hdVideoValue);
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("IsHDVideo", null);
         }
 
         [Test]
@@ -392,8 +432,14 @@ namespace Knuckleball.Tests
         [Test]
         public void ShouldWriteIsGapless()
         {
-            // TODO: Boolean properties will require special handling.
-            Assert.Fail("Test not yet implemented");
+            bool? gaplessValue = true;
+            RunSetValueTest("IsGapless", gaplessValue);
+
+            gaplessValue = false;
+            RunSetValueTest("IsGapless", gaplessValue);
+
+            // Test that we can write a null value to the tag too.
+            RunSetValueTest("IsGapless", null);
         }
         
         [Test]
@@ -444,7 +490,7 @@ namespace Knuckleball.Tests
         [Test]
         public void ShouldWritePlaylistId()
         {
-            RunSetValueTest("PlaylistId", 120);
+            RunSetValueTest("PlaylistId", 120L);
 
             // Test that we can write a null value to the tag too.
             RunSetValueTest("PlaylistId", null);
