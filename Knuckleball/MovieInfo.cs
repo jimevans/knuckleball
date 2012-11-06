@@ -30,6 +30,11 @@ namespace Knuckleball
     [SuppressMessage("Microsoft.StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "iTunMOVI is the correct name of the atom.")]
     public class MovieInfo : Atom
     {
+        private IList<string> cast;
+        private IList<string> directors;
+        private IList<string> producers;
+        private IList<string> screenwriters;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="MovieInfo"/> class.
         /// </summary>
@@ -43,105 +48,285 @@ namespace Knuckleball
         public string Studio { get; set; }
 
         /// <summary>
-        /// Gets or sets a list of cast members for this movie.
+        /// Gets a list of cast members for this movie.
         /// </summary>
         /// <remarks>
-        /// The <see cref="Cast"/> property is read-write, since not
-        /// only can items be added to and removed from the list, but 
-        /// the list can also not exist at all in the underlying file.
-        /// This is to draw the distinction between an empty list where
+        /// The <see cref="Cast"/> property is read-only, but can be
+        /// modified by the normal methods of a <see cref="IList{T}"/>.
+        /// There is a distinction to be drawn between an empty list where
         /// the cast portion of the atom exists in the file, but with no
         /// entries, and the state where the cast portion does not exist
-        /// at all in the file.
+        /// at all in the file. To handle the latter case, use the 
+        /// <see cref="RemoveCast"/> method. Note that if the cast portion
+        /// of the atom does not exist, accessing the <see cref="Cast"/>
+        /// property will create an empty list, adding an empty list to 
+        /// that portion of the atom.
         /// </remarks>
-        public IList<string> Cast { get; set; }
+        public IList<string> Cast
+        {
+            get
+            {
+                if (this.cast == null)
+                {
+                    this.cast = new List<string>();
+                }
+
+                return this.cast;
+            }
+        }
 
         /// <summary>
-        /// Gets or sets a list of directors for this movie.
+        /// Gets a list of directors for this movie.
         /// </summary>
         /// <remarks>
-        /// The <see cref="Directors"/> property is read-write, since not
-        /// only can items be added to and removed from the list, but 
-        /// the list can also not exist at all in the underlying file.
-        /// This is to draw the distinction between an empty list where
-        /// the directors portion of the atom exists in the file, but with no
+        /// The <see cref="Directors"/> property is read-only, but can be
+        /// modified by the normal methods of a <see cref="IList{T}"/>.
+        /// There is a distinction to be drawn between an empty list where
+        /// the cast portion of the atom exists in the file, but with no
         /// entries, and the state where the directors portion does not exist
-        /// at all in the file.
+        /// at all in the file. To handle the latter case, use the 
+        /// <see cref="RemoveDirectors"/> method. Note that if the directors portion
+        /// of the atom does not exist, accessing the <see cref="Directors"/>
+        /// property will create an empty list, adding an empty list to 
+        /// that portion of the atom.
         /// </remarks>
-        public IList<string> Directors { get; set; }
+        public IList<string> Directors
+        {
+            get
+            {
+                if (this.directors == null)
+                {
+                    this.directors = new List<string>();
+                }
+
+                return this.directors;
+            }
+        }
 
         /// <summary>
         /// Gets or sets a list of producers for this movie.
         /// </summary>
         /// <remarks>
-        /// The <see cref="Producers"/> property is read-write, since not
-        /// only can items be added to and removed from the list, but 
-        /// the list can also not exist at all in the underlying file.
-        /// This is to draw the distinction between an empty list where
-        /// the producers portion of the atom exists in the file, but with no
+        /// The <see cref="Producers"/> property is read-only, but can be
+        /// modified by the normal methods of a <see cref="IList{T}"/>.
+        /// There is a distinction to be drawn between an empty list where
+        /// the cast portion of the atom exists in the file, but with no
         /// entries, and the state where the producers portion does not exist
-        /// at all in the file.
+        /// at all in the file. To handle the latter case, use the 
+        /// <see cref="RemoveProducers"/> method. Note that if the producers portion
+        /// of the atom does not exist, accessing the <see cref="Producers"/>
+        /// property will create an empty list, adding an empty list to 
+        /// that portion of the atom.
         /// </remarks>
-        public IList<string> Producers { get; set; }
+        public IList<string> Producers
+        {
+            get
+            {
+                if (this.producers == null)
+                {
+                    this.producers = new List<string>();
+                }
+
+                return this.producers;
+            }
+        }
 
         /// <summary>
         /// Gets or sets a list of screenwriters for this movie.
         /// </summary>
         /// <remarks>
-        /// The <see cref="Screenwriters"/> property is read-write, since not
-        /// only can items be added to and removed from the list, but 
-        /// the list can also not exist at all in the underlying file.
-        /// This is to draw the distinction between an empty list where
-        /// the screenwriters portion of the atom exists in the file, but with no
-        /// entries, and the state where the screenwriters portion does not exist
-        /// at all in the file.
+        /// The <see cref="Screenwriters"/> property is read-only, but can be
+        /// modified by the normal methods of a <see cref="IList{T}"/>.
+        /// There is a distinction to be drawn between an empty list where
+        /// the cast portion of the atom exists in the file, but with no
+        /// entries, and the state where the writers portion does not exist
+        /// at all in the file. To handle the latter case, use the 
+        /// <see cref="RemoveScreenwriters"/> method. Note that if the writers portion
+        /// of the atom does not exist, accessing the <see cref="Screenwriters"/>
+        /// property will create an empty list, adding an empty list to 
+        /// that portion of the atom.
         /// </remarks>
-        public IList<string> Screenwriters { get; set; }
+        public IList<string> Screenwriters
+        {
+            get
+            {
+                if (this.screenwriters == null)
+                {
+                    this.screenwriters = new List<string>();
+                }
+
+                return this.screenwriters;
+            }
+        }
+
+
+        public bool HasCast
+        {
+            get { return this.cast != null; }
+        }
+
+        public bool HasDirectors
+        {
+            get { return this.directors != null; }
+        }
+
+        public bool HasProducers
+        {
+            get { return this.producers != null; }
+        }
+
+        public bool HasScreenwriters
+        {
+            get { return this.screenwriters != null; }
+        }
+
+        internal override string Meaning
+        {
+            get { return "com.apple.iTunes"; }
+        }
+
+        internal override string Name
+        {
+            get { return "iTunMOVI"; }
+        }
+
+        public void RemoveCast()
+        {
+            this.cast = null;
+        }
+
+        public void RemoveDirectors()
+        {
+            this.directors = null;
+        }
+
+        public void RemoveProducers()
+        {
+            this.producers = null;
+        }
+
+        public void RemoveScreenwriters()
+        {
+            this.screenwriters = null;
+        }
 
         /// <summary>
         /// Populates this <see cref="MovieInfo"/> with the specific data stored in it in the referenced file.
         /// </summary>
         /// <param name="data">The iTunes Metadata Format data used to populate this <see cref="MovieInfo"/>.</param>
-        internal override void Populate(NativeMethods.MP4ItmfData data)
+        internal override void Populate(byte[] dataBuffer)
         {
-            byte[] buffer = data.value.ReadBuffer(data.valueSize);
             Dictionary<string, object> map = null;
-            if (data.typeCode == NativeMethods.MP4ItmfBasicType.Utf8)
+            using (MemoryStream stream = new MemoryStream(dataBuffer))
             {
-                using (MemoryStream stream = new MemoryStream(buffer))
+                using (XmlTextReader reader = new XmlTextReader(stream))
                 {
-                    using (XmlTextReader reader = new XmlTextReader(stream))
+                    reader.WhitespaceHandling = WhitespaceHandling.None;
+                    while (reader.Name != "plist" && !reader.IsStartElement())
                     {
-                        reader.WhitespaceHandling = WhitespaceHandling.None;
-                        while (reader.Name != "plist" && !reader.IsStartElement())
-                        {
-                            reader.Read();
-                        }
-
-                        // Move to the first child of the plist element, which should be a "dict" element.
-                        // NOTE: This is a very fragile algorithm based on a specific format of XML contained
-                        // in the atom. Any changes to this XML format is likely to break this, severely.
                         reader.Read();
-                        map = this.ProcessElement(reader) as Dictionary<string, object>;
-                        while (!reader.EOF)
-                        {
-                            reader.Read();
-                        }
+                    }
+
+                    // Move to the first child of the plist element, which should be a "dict" element.
+                    // NOTE: This is a very fragile algorithm based on a specific format of XML contained
+                    // in the atom. Any changes to this XML format is likely to break this, severely.
+                    reader.Read();
+                    map = this.ProcessElement(reader) as Dictionary<string, object>;
+                    while (!reader.EOF)
+                    {
+                        reader.Read();
                     }
                 }
             }
 
             if (map != null)
             {
-                this.Cast = ExtractList(map, "cast");
-                this.Directors = ExtractList(map, "directors");
-                this.Producers = ExtractList(map, "producers");
-                this.Screenwriters = ExtractList(map, "screenwriters");
+                this.cast = ExtractList(map, "cast");
+                this.directors = ExtractList(map, "directors");
+                this.producers = ExtractList(map, "producers");
+                this.screenwriters = ExtractList(map, "screenwriters");
                 if (map.ContainsKey("studio"))
                 {
                     this.Studio = map["studio"].ToString();
                 }
             }
+        }
+
+        internal override byte[] ToByteArray()
+        {
+            byte[] buffer = null;
+            XmlWriterSettings settings = new XmlWriterSettings();
+            settings.Encoding = Encoding.UTF8;
+            settings.NewLineChars = "\n";
+            settings.IndentChars = "\t";
+            settings.Indent = true;
+            using (MemoryStream stream = new MemoryStream())
+            {
+                using (XmlWriter writer = XmlWriter.Create(stream, settings))
+                {
+                    writer.WriteDocType("plist", "-//Apple//DTD PLIST 1.0//EN", "http://www.apple.com/DTDs/PropertyList-1.0.dtd", null);
+                    writer.WriteStartElement("plist");
+                    writer.WriteAttributeString("version", "1.0");
+                    writer.WriteStartElement("dict");
+                    if (this.cast != null)
+                    {
+                        WriteList(writer, this.cast, "cast");
+                    }
+
+                    if (this.directors != null)
+                    {
+                        WriteList(writer, this.directors, "directors");
+                    }
+
+                    if (this.producers != null)
+                    {
+                        WriteList(writer, this.producers, "producers");
+                    }
+
+                    if (this.screenwriters != null)
+                    {
+                        WriteList(writer, this.screenwriters, "screenwriters");
+                    }
+
+                    if (this.Studio != null)
+                    {
+                        writer.WriteElementString("key", "studio");
+                        writer.WriteElementString("string", this.Studio);
+                    }
+
+                    writer.WriteEndElement();
+                    writer.WriteEndElement();
+                }
+
+                buffer = stream.ToArray();
+            }
+
+            // HACK! The XmlWriter doesn't format things exactly as I'd like
+            // so we're going to convert to a string, manipulate the string,
+            // then back to a byte array.
+            if (buffer != null)
+            {
+                string xmlString = Encoding.UTF8.GetString(buffer);
+                xmlString = xmlString.Replace("encoding=\"utf-8\"", "encoding=\"UTF-8\"").Replace("\n\t", "\n");
+                buffer = Encoding.UTF8.GetBytes(xmlString);
+            }
+
+            return buffer;
+        }
+
+        private void WriteList(XmlWriter writer, IList<string> list, string listName)
+        {
+            writer.WriteElementString("key", listName);
+            writer.WriteStartElement("array");
+            foreach (string listEntry in list)
+            {
+                writer.WriteStartElement("dict");
+                writer.WriteElementString("key", "name");
+                writer.WriteElementString("string", listEntry);
+                writer.WriteEndElement();
+            }
+
+            writer.WriteFullEndElement();
         }
 
         private static List<string> ExtractList(Dictionary<string, object> map, string key)

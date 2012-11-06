@@ -530,15 +530,65 @@ namespace Knuckleball.Tests
         [Test]
         public void ShouldWriteRatingInfo()
         {
-            // TODO: Raw atom properties will require special handling.
-            Assert.Fail("Test not yet implemented");
+            RatingInfo ratingInfo = new RatingInfo();
+            ratingInfo.RatingSource = "mpaa";
+            ratingInfo.Rating = "G";
+            ratingInfo.SortValue = 100;
+            this.file.RatingInfo = ratingInfo;
+            this.file.WriteTags();
+
+            this.file.ReadTags();
+            Assert.AreEqual("mpaa", this.file.RatingInfo.RatingSource);
+            Assert.AreEqual("G", this.file.RatingInfo.Rating);
+            Assert.AreEqual(100, this.file.RatingInfo.SortValue);
+            Assert.AreEqual(string.Empty, this.file.RatingInfo.RatingAnnotation);
+
+            this.file.RatingInfo = null;
+            this.file.WriteTags();
+            this.file.ReadTags();
+            Assert.IsNull(this.file.RatingInfo);
         }
 
         [Test]
         public void ShouldWriteMovieInfo()
         {
-            // TODO: Raw atom properties will require special handling.
-            Assert.Fail("Test not yet implemented");
+            // TODO: Break this up into standalone tests.
+            MovieInfo movieInfo = new MovieInfo();
+            movieInfo.Cast.Add("Jimmy Bear");
+            movieInfo.Directors.Add("Orson Welles");
+            movieInfo.Producers.Add("Jim Evans");
+            movieInfo.Screenwriters.Add("Herman J. Manciewicz");
+            movieInfo.Studio = "WonderBoy Productions";
+
+            this.file.MovieInfo = movieInfo;
+            this.file.WriteTags();
+
+            this.file.ReadTags();
+            Assert.That(file.MovieInfo.Cast, Is.EquivalentTo(new List<string>() { "Jimmy Bear" }));
+            Assert.That(file.MovieInfo.Directors, Is.EquivalentTo(new List<string>() { "Orson Welles" }));
+            Assert.That(file.MovieInfo.Producers, Is.EquivalentTo(new List<string>() { "Jim Evans" }));
+            Assert.That(file.MovieInfo.Screenwriters, Is.EquivalentTo(new List<string>() { "Herman J. Manciewicz" }));
+            Assert.AreEqual("WonderBoy Productions", file.MovieInfo.Studio);
+
+            // Test can have a null part of the MovieInfo
+            file.MovieInfo.RemoveCast();
+            this.file.WriteTags();
+            this.file.ReadTags();
+            Assert.IsFalse(file.MovieInfo.HasCast);
+
+            // Touch the Cast property; it should be recreated.
+            // Test can have a zero-length list for the MovieInfo.
+            int count = this.file.MovieInfo.Cast.Count;
+            this.file.WriteTags();
+            this.file.ReadTags();
+            Assert.IsTrue(file.MovieInfo.HasCast);
+            Assert.AreEqual(0, file.MovieInfo.Cast.Count);
+
+            // Test the null case.
+            this.file.MovieInfo = null;
+            this.file.WriteTags();
+            this.file.ReadTags();
+            Assert.IsNull(this.file.MovieInfo);
         }
 
         // The following are tags unique to TV Episodes

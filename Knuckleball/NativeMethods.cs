@@ -337,6 +337,9 @@ namespace Knuckleball
         public static extern void MP4ItmfItemListFree(IntPtr itemList);
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr MP4ItmfItemAlloc(string code, int numData);
+
+        [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool MP4ItmfAddItem(IntPtr hFile, IntPtr item);
 

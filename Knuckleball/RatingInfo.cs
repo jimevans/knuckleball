@@ -18,6 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Runtime.InteropServices;
 
 namespace Knuckleball
 {
@@ -56,6 +57,16 @@ namespace Knuckleball
         /// </summary>
         public string RatingAnnotation { get; set; }
 
+        internal override string Meaning
+        {
+            get { return "com.apple.iTunes"; }
+        }
+
+        internal override string Name
+        {
+            get { return "iTunEXTC"; }
+        }
+
         /// <summary>
         /// Returns the string representation of the rating.
         /// </summary>
@@ -66,24 +77,60 @@ namespace Knuckleball
         }
 
         /// <summary>
+        /// Returns the hash code for this <see cref="RatingsInfo"/>.
+        /// </summary>
+        /// <returns>A 32-bit signed integer hash code.</returns>
+        public override int GetHashCode()
+        {
+            return this.ToString().GetHashCode();
+        }
+
+        /// <summary>
+        /// Determines whether two <see cref="RatingsInfo"/> objects have the same value.
+        /// </summary>
+        /// <param name="obj">Determines whether this instance and a specified object, which
+        /// must also be a <see cref="RatingsInfo"/> object, have the same value.</param>
+        /// <returns><see langword="true"/> if obj is a <see cref="RatingsInfo"/> and its value
+        /// is the same as this instance; otherwise, <see langword="false"/>.</returns>
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+
+            RatingInfo other = obj as RatingInfo;
+            if (other == null)
+            {
+                return false;
+            }
+
+            return this.ToString() == other.ToString();
+        }
+
+        /// <summary>
         /// Populates this <see cref="RatingInfo"/> with the specific data stored in it in the referenced file.
         /// </summary>
-        /// <param name="data">The iTunes Metadata Format data used to populate this <see cref="RatingInfo"/>.</param>
-        internal override void Populate(NativeMethods.MP4ItmfData data)
+        /// <param name="dataBuffer">A byte array containing the iTunes Metadata Format data
+        /// used to populate this <see cref="RatingsInfo"/>.</param>
+        internal override void Populate(byte[] dataBuffer)
         {
-            byte[] buffer = data.value.ReadBuffer(data.valueSize);
-            if (data.typeCode == NativeMethods.MP4ItmfBasicType.Utf8)
+            string ratingString = Encoding.UTF8.GetString(dataBuffer);
+            string[] parts = ratingString.Split('|');
+            this.RatingSource = parts[0];
+            this.Rating = parts[1];
+            this.SortValue = int.Parse(parts[2], CultureInfo.InvariantCulture);
+            if (parts.Length > 3)
             {
-                string ratingString = Encoding.UTF8.GetString(buffer);
-                string[] parts = ratingString.Split('|');
-                this.RatingSource = parts[0];
-                this.Rating = parts[1];
-                this.SortValue = int.Parse(parts[2], CultureInfo.InvariantCulture);
-                if (parts.Length > 3)
-                {
-                    this.RatingAnnotation = parts[3];
-                }
+                this.RatingAnnotation = parts[3];
             }
+        }
+
+        internal override byte[] ToByteArray()
+        {
+            string rating = this.ToString();
+            byte[] buffer = Encoding.UTF8.GetBytes(rating);
+            return buffer;
         }
     }
 }

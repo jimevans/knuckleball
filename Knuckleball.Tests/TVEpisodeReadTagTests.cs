@@ -311,11 +311,7 @@ namespace Knuckleball.Tests
         [Test]
         public void ShouldReadMovieInfo()
         {
-            Assert.IsNull(file.MovieInfo.Cast);
-            Assert.IsNull(file.MovieInfo.Directors);
-            Assert.IsNull(file.MovieInfo.Producers);
-            Assert.IsNull(file.MovieInfo.Screenwriters);
-            Assert.IsNull(file.MovieInfo.Studio);
+            Assert.IsNull(file.MovieInfo);
         }
 
         // The following are tags unique to TV Episodes

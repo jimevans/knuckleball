@@ -430,8 +430,8 @@ namespace Knuckleball
 
             NativeMethods.MP4TagsFree(tagPtr);
 
-            this.RatingInfo = ReadRawAtom<RatingInfo>(fileHandle, "com.apple.iTunes", "iTunEXTC");
-            this.MovieInfo = ReadRawAtom<MovieInfo>(fileHandle, "com.apple.iTunes", "iTunMOVI");
+            this.RatingInfo = ReadRawAtom<RatingInfo>(fileHandle);
+            this.MovieInfo = ReadRawAtom<MovieInfo>(fileHandle);
 
             NativeMethods.MP4Close(fileHandle);
         }
@@ -699,6 +699,19 @@ namespace Knuckleball
 
             retVal = NativeMethods.MP4TagsStore(tagsPtr, fileHandle);
             NativeMethods.MP4TagsFree(tagsPtr);
+
+            RatingInfo info = ReadRawAtom<RatingInfo>(fileHandle);
+            if (this.RatingInfo != info)
+            {
+                WriteRawAtom<RatingInfo>(fileHandle, this.RatingInfo);
+            }
+
+            //MovieInfo movieInfo = ReadRawAtom<MovieInfo>(fileHandle);
+            //if (this.MovieInfo != movieInfo)
+            //{
+                WriteRawAtom<MovieInfo>(fileHandle, this.MovieInfo);
+            //}
+
             NativeMethods.MP4Close(fileHandle);
         }
 
@@ -778,18 +791,69 @@ namespace Knuckleball
             }
         }
 
-        private static T ReadRawAtom<T>(IntPtr fileHandle, string atomMeaning, string atomName) where T : Atom, new()
+        private static T ReadRawAtom<T>(IntPtr fileHandle) where T : Atom, new()
         {
-            T atom = null;
-            IntPtr rawAtomPointer = NativeMethods.MP4ItmfGetItemsByMeaning(fileHandle, atomMeaning, atomName);
-            if (rawAtomPointer != IntPtr.Zero)
-            {   
-                // Must use this construct, as generics don't allow constructors with parameters.
-                atom = new T();
-                atom.Initialize(rawAtomPointer);
+            // Must use this construct, as generics don't allow constructors with parameters.
+            T atom = new T();
+            if (!atom.Initialize(fileHandle))
+            {
+                return null;
             }
 
             return atom;
+        }
+
+        private void WriteRawAtom<T>(IntPtr fileHandle, T atom) where T : Atom, new()
+        {
+            // Because Generics don't allow inheritable static members, and we
+            // really don't want to resort to reflection, we can create an instance
+            // of the appropriate Atom type, only to get the Meaning and Name properties.
+            // Passing in the parameters leads to potentially getting the strings wrong.
+            // This solution is hacky in the worst possible way; let's think of a better
+            // approach.
+            T templateAtom = new T();
+            string atomMeaning = templateAtom.Meaning;
+            string atomName = templateAtom.Name;
+
+            IntPtr listPtr = NativeMethods.MP4ItmfGetItemsByMeaning(fileHandle, atomMeaning, atomName);
+            if (listPtr != IntPtr.Zero)
+            {
+                NativeMethods.MP4ItmfItemList list = listPtr.ReadStructure<NativeMethods.MP4ItmfItemList>();
+                for (int i = 0; i < list.size; i++)
+                {
+                    IntPtr item = list.elements[i];
+                    NativeMethods.MP4ItmfRemoveItem(fileHandle, item);
+                }
+
+                NativeMethods.MP4ItmfItemListFree(listPtr);
+
+                if (atom != null)
+                {
+                    IntPtr newItemPtr = NativeMethods.MP4ItmfItemAlloc("----", 1);
+                    NativeMethods.MP4ItmfItem newItem = newItemPtr.ReadStructure<NativeMethods.MP4ItmfItem>();
+                    newItem.mean = atom.Meaning;
+                    newItem.name = atom.Name;
+
+                    NativeMethods.MP4ItmfData data = new NativeMethods.MP4ItmfData();
+                    data.typeCode = atom.DataType;
+                    byte[] dataBuffer = atom.ToByteArray();
+                    data.valueSize = dataBuffer.Length;
+
+                    IntPtr dataValuePointer = Marshal.AllocHGlobal(dataBuffer.Length);
+                    Marshal.Copy(dataBuffer, 0, dataValuePointer, dataBuffer.Length);
+                    data.value = dataValuePointer;
+
+                    IntPtr dataPointer = Marshal.AllocHGlobal(Marshal.SizeOf(data));
+                    Marshal.StructureToPtr(data, dataPointer, false);
+                    newItem.dataList.elements[0] = dataPointer;
+
+                    Marshal.StructureToPtr(newItem, newItemPtr, false);
+                    NativeMethods.MP4ItmfAddItem(fileHandle, newItemPtr);
+
+                    Marshal.FreeHGlobal(dataPointer);
+                    Marshal.FreeHGlobal(dataValuePointer);
+                }
+            }
         }
 
         private void ReadArtwork(IntPtr artworkStructurePointer)
