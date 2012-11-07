@@ -104,7 +104,7 @@ namespace Knuckleball
         }
 
         /// <summary>
-        /// Gets or sets a list of producers for this movie.
+        /// Gets a list of producers for this movie.
         /// </summary>
         /// <remarks>
         /// The <see cref="Producers"/> property is read-only, but can be
@@ -132,7 +132,7 @@ namespace Knuckleball
         }
 
         /// <summary>
-        /// Gets or sets a list of screenwriters for this movie.
+        /// Gets a list of screenwriters for this movie.
         /// </summary>
         /// <remarks>
         /// The <see cref="Screenwriters"/> property is read-only, but can be
@@ -159,61 +159,95 @@ namespace Knuckleball
             }
         }
 
-
+        /// <summary>
+        /// Gets a value indicating whether the <see cref="Cast"/> property has data, potentially including an empty list.
+        /// Returns <see langword="false"/> if the <see cref="Cast"/> property is <see langword="null"/>.
+        /// </summary>
         public bool HasCast
         {
             get { return this.cast != null; }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether the <see cref="Directors"/> property has data, potentially including an empty list.
+        /// Returns <see langword="false"/> if the <see cref="Directors"/> property is <see langword="null"/>.
+        /// </summary>
         public bool HasDirectors
         {
             get { return this.directors != null; }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether the <see cref="Producers"/> property has data, potentially including an empty list.
+        /// Returns <see langword="false"/> if the <see cref="Producers"/> property is <see langword="null"/>.
+        /// </summary>
         public bool HasProducers
         {
             get { return this.producers != null; }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether the <see cref="Screenwriters"/> property has data, potentially including an empty list.
+        /// Returns <see langword="false"/> if the <see cref="Screenwriters"/> property is <see langword="null"/>.
+        /// </summary>
         public bool HasScreenwriters
         {
             get { return this.screenwriters != null; }
         }
 
+        /// <summary>
+        /// Gets the meaning of the atom.
+        /// </summary>
         internal override string Meaning
         {
             get { return "com.apple.iTunes"; }
         }
 
+        /// <summary>
+        /// Gets the name of the atom.
+        /// </summary>
         internal override string Name
         {
             get { return "iTunMOVI"; }
         }
 
+        /// <summary>
+        /// Removes all data from the <see cref="Cast"/> property, causing it to be <see langword="null"/>.
+        /// </summary>
         public void RemoveCast()
         {
             this.cast = null;
         }
 
+        /// <summary>
+        /// Removes all data from the <see cref="Directors"/> property, causing it to be <see langword="null"/>.
+        /// </summary>
         public void RemoveDirectors()
         {
             this.directors = null;
         }
 
+        /// <summary>
+        /// Removes all data from the <see cref="Producers"/> property, causing it to be <see langword="null"/>.
+        /// </summary>
         public void RemoveProducers()
         {
             this.producers = null;
         }
 
+        /// <summary>
+        /// Removes all data from the <see cref="Screenwriters"/> property, causing it to be <see langword="null"/>.
+        /// </summary>
         public void RemoveScreenwriters()
         {
             this.screenwriters = null;
         }
 
         /// <summary>
-        /// Populates this <see cref="MovieInfo"/> with the specific data stored in it in the referenced file.
+        /// Populates this <see cref="MovieInfo"/> with the specific data stored in it.
         /// </summary>
-        /// <param name="data">The iTunes Metadata Format data used to populate this <see cref="MovieInfo"/>.</param>
+        /// <param name="dataBuffer">A byte array containing the iTunes Metadata Format data
+        /// used to populate this <see cref="MovieInfo"/>.</param>
         internal override void Populate(byte[] dataBuffer)
         {
             Dictionary<string, object> map = null;
@@ -252,6 +286,10 @@ namespace Knuckleball
             }
         }
 
+        /// <summary>
+        /// Returns the data to be stored in this <see cref="MovieInfo"/> as a byte array.
+        /// </summary>
+        /// <returns>The byte array containing the data to be stored in the atom.</returns>
         internal override byte[] ToByteArray()
         {
             byte[] buffer = null;
@@ -314,7 +352,7 @@ namespace Knuckleball
             return buffer;
         }
 
-        private void WriteList(XmlWriter writer, IList<string> list, string listName)
+        private static void WriteList(XmlWriter writer, IList<string> list, string listName)
         {
             writer.WriteElementString("key", listName);
             writer.WriteStartElement("array");

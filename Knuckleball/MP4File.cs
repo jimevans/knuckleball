@@ -679,8 +679,8 @@ namespace Knuckleball
                 NativeMethods.MP4TagsSetXID(tagsPtr, this.Xid);
             }
 
-            WriteTrackInfo(tagsPtr, tags.track);
-            WriteDiscInfo(tagsPtr, tags.disk);
+            this.WriteTrackInfo(tagsPtr, tags.track);
+            this.WriteDiscInfo(tagsPtr, tags.disk);
 
             // If the artwork has been edited, there are two possibilities:
             // First we are replacing an existing piece of artwork with another; or
@@ -689,7 +689,7 @@ namespace Knuckleball
             {
                 if (this.artwork != null)
                 {
-                    WriteArtwork(tagsPtr);
+                    this.WriteArtwork(tagsPtr);
                 }
                 else if (this.ArtworkCount != 0)
                 {
@@ -706,11 +706,14 @@ namespace Knuckleball
                 WriteRawAtom<RatingInfo>(fileHandle, this.RatingInfo);
             }
 
-            //MovieInfo movieInfo = ReadRawAtom<MovieInfo>(fileHandle);
-            //if (this.MovieInfo != movieInfo)
-            //{
-                WriteRawAtom<MovieInfo>(fileHandle, this.MovieInfo);
-            //}
+            // TODO: Implement an equality comparison for MovieInfo, so
+            // as to only write the atom to the file if it's been modified.
+            // MovieInfo movieInfo = ReadRawAtom<MovieInfo>(fileHandle);
+            // if (this.MovieInfo != movieInfo)
+            // {
+            //    WriteRawAtom<MovieInfo>(fileHandle, this.MovieInfo);
+            // }
+            WriteRawAtom<MovieInfo>(fileHandle, this.MovieInfo);
 
             NativeMethods.MP4Close(fileHandle);
         }
@@ -821,7 +824,7 @@ namespace Knuckleball
             byte[] artworkBuffer = new byte[artwork.size];
             Marshal.Copy(artwork.data, artworkBuffer, 0, artwork.size);
             this.artworkStream = new MemoryStream(artworkBuffer);
-            this.artwork = Image.FromStream(artworkStream);
+            this.artwork = Image.FromStream(this.artworkStream);
 
             switch (artwork.type)
             {

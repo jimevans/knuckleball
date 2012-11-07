@@ -17,8 +17,8 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Knuckleball
 {
@@ -57,11 +57,17 @@ namespace Knuckleball
         /// </summary>
         public string RatingAnnotation { get; set; }
 
+        /// <summary>
+        /// Gets the meaning of the atom.
+        /// </summary>
         internal override string Meaning
         {
             get { return "com.apple.iTunes"; }
         }
 
+        /// <summary>
+        /// Gets the name of the atom.
+        /// </summary>
         internal override string Name
         {
             get { return "iTunEXTC"; }
@@ -126,6 +132,10 @@ namespace Knuckleball
             }
         }
 
+        /// <summary>
+        /// Returns the data to be stored in this <see cref="RatingInfo"/> as a byte array.
+        /// </summary>
+        /// <returns>The byte array containing the data to be stored in the atom.</returns>
         internal override byte[] ToByteArray()
         {
             string rating = this.ToString();

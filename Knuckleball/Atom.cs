@@ -33,13 +33,22 @@ namespace Knuckleball
         {
         }
 
+        /// <summary>
+        /// Gets the data type of the data stored in the atom.
+        /// </summary>
         internal virtual NativeMethods.MP4ItmfBasicType DataType 
         {
             get { return NativeMethods.MP4ItmfBasicType.Utf8; }
         }
 
+        /// <summary>
+        /// Gets the meaning of the atom.
+        /// </summary>
         internal abstract string Meaning { get; }
 
+        /// <summary>
+        /// Gets the name of the atom.
+        /// </summary>
         internal abstract string Name { get; }
 
         /// <summary>
@@ -47,6 +56,7 @@ namespace Knuckleball
         /// value.
         /// </summary>
         /// <param name="fileHandle">The <see cref="IntPtr"/> file handle of the file from which to read this <see cref="Atom"/>.</param>
+        /// <returns><see langword="true"/> if this <see cref="Atom"/> was successfully initialized; otherwise, <see langword="false"/>.</returns>
         internal bool Initialize(IntPtr fileHandle)
         {
             bool isInitialized = false;
@@ -85,6 +95,10 @@ namespace Knuckleball
         /// used to populate this <see cref="Atom"/>.</param>
         internal abstract void Populate(byte[] dataBuffer);
 
+        /// <summary>
+        /// Returns the data to be stored in this <see cref="Atom"/> as a byte array.
+        /// </summary>
+        /// <returns>The byte array containing the data to be stored in the atom.</returns>
         internal abstract byte[] ToByteArray();
     }
 }
