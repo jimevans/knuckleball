@@ -67,7 +67,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TVEpisodeWriteTagTests.cs" />
+    <Compile Include="TagWritingTests.cs" />
     <Compile Include="IntPtrExtensionTests.cs" />
     <Compile Include="MovieReadTagTests.cs" />
     <Compile Include="TestFileUtilities.cs" />

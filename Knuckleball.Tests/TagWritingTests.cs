@@ -21,7 +21,7 @@ namespace Knuckleball.Tests
     /// TODO: Update summary.
     /// </summary>
     [TestFixture]
-    public class TVEpisodeWriteTagTests
+    public class TagWritingTests
     {
         private MP4File file = null;
         private string fileCopy;
