@@ -23,12 +23,13 @@ namespace Knuckleball
     /// <summary>
     /// Indicates the type of iTunes Music Store account with which this file was purchased.
     /// </summary>
-    public enum MediaStoreAccountKind
+    [SuppressMessage("Microsoft.Design", "CA1028:EnumStorageShouldBeInt32", Justification = "MediaStoreAccountKind is a byte in the external API.")]
+    public enum MediaStoreAccountKind : byte
     {
         /// <summary>
         /// Indicates the account type was not set in this file.
         /// </summary>
-        NotSet = -1,
+        NotSet = byte.MaxValue,
 
         /// <summary>
         /// Indicates the file was purchased with an Apple iTunes account.

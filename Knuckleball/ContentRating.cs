@@ -14,6 +14,7 @@
 // -----------------------------------------------------------------------
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 
@@ -22,12 +23,13 @@ namespace Knuckleball
     /// <summary>
     /// Specifies the value for the content rating of an MP4 file.
     /// </summary>
-    public enum ContentRating
+    [SuppressMessage("Microsoft.Design", "CA1028:EnumStorageShouldBeInt32", Justification = "ContentRating is a byte in the external API.")]
+    public enum ContentRating : byte
     {
         /// <summary>
         /// Indicates that the value is not set in the file.
         /// </summary>
-        NotSet = -1,
+        NotSet = byte.MaxValue,
 
         /// <summary>
         /// Indicates the value has been set, but there is no rating for the content of this file.

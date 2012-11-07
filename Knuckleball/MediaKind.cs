@@ -23,12 +23,13 @@ namespace Knuckleball
     /// <summary>
     /// Indicates the kind of media contained in this file.
     /// </summary>
-    public enum MediaKind
+    [SuppressMessage("Microsoft.Design", "CA1028:EnumStorageShouldBeInt32", Justification = "MediaKind is a byte in the external API.")]
+    public enum MediaKind : byte
     {
         /// <summary>
         /// Indicates the media type is not set in this file.
         /// </summary>
-        NotSet = -1,
+        NotSet = byte.MaxValue,
 
         /// <summary>
         /// Indicates the media type is unknown.

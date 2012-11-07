@@ -114,14 +114,14 @@ namespace Knuckleball.Tests
         [Test]
         public void ReadEnumShouldReturnDefaultValueForZeroPointer()
         {
-            Assert.AreEqual(TestEnum.NotSet, IntPtr.Zero.ReadEnumValue<TestEnum, int>(TestEnum.NotSet));
+            Assert.AreEqual(TestEnum.NotSet, IntPtr.Zero.ReadEnumValue<TestEnum>(TestEnum.NotSet));
         }
 
         [Test]
         public void ReadEnumShouldReturnEnumValueForPointerToEnum()
         {
             Marshal.WriteInt32(pointer, (int)TestEnum.SecondValue);
-            Assert.AreEqual(TestEnum.SecondValue, pointer.ReadEnumValue<TestEnum, int>(TestEnum.NotSet));
+            Assert.AreEqual(TestEnum.SecondValue, pointer.ReadEnumValue<TestEnum>(TestEnum.NotSet));
         }
 
         [StructLayout(LayoutKind.Sequential)]

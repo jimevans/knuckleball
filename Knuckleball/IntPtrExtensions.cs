@@ -123,7 +123,6 @@ namespace Knuckleball
         /// memory by the specified pointer value.
         /// </summary>
         /// <typeparam name="T">A value derived from <see cref="System.Enum"/>.</typeparam>
-        /// <typeparam name="TEnum">The underlying integer type of the enumerated value.</typeparam>
         /// <param name="value">The <see cref="IntPtr"/> value indicating the location
         /// in memory at which to begin reading data.</param>
         /// <param name="defaultValue">The default value of the enumerated value to return
@@ -131,25 +130,30 @@ namespace Knuckleball
         /// (<see cref="IntPtr.Zero"/>).</param>
         /// <returns>The enumerated value pointed to by this <see cref="IntPtr"/>. Returns
         /// the specified default value if this pointer is a null pointer (<see cref="IntPtr.Zero"/>).</returns>
-        public static T ReadEnumValue<T, TEnum>(this IntPtr value, T defaultValue)
+        public static T ReadEnumValue<T>(this IntPtr value, T defaultValue)
             where T : struct
-            where TEnum : struct
         {
             if (value == IntPtr.Zero)
             {
                 return defaultValue;
             }
 
+            if (!typeof(T).IsEnum)
+            {
+                throw new ArgumentException("Type T must be an enumerated value");
+            }
+
             object rawValue;
-            if (typeof(TEnum) == typeof(byte))
+            Type underlyingType = Enum.GetUnderlyingType(typeof(T));
+            if (underlyingType == typeof(byte))
             {
                 rawValue = ReadByte(value).Value;
             }
-            else if (typeof(TEnum) == typeof(long))
+            else if (underlyingType == typeof(long))
             {
                 rawValue = ReadLong(value).Value;
             }
-            else if (typeof(TEnum) == typeof(short))
+            else if (underlyingType == typeof(short))
             {
                 rawValue = ReadShort(value).Value;
             }
