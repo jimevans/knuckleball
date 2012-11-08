@@ -14,7 +14,7 @@ Once you have built the Knuckleball.dll assembly and created a reference to it i
 project, you should be able to do the following to change, say, the Title of the content of
 a file:
 
-```c-sharp
+```c#
 MP4File file = new MP4File(@"C:\path\to\valid\mp4file.m4v");
 file.ReadTags();
 file.Title = "My New Title";
