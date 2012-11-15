@@ -33,6 +33,7 @@ namespace Knuckleball
         private MemoryStream artworkStream;
         private Image artwork;
         private bool isArtworkEdited;
+        private List<Chapter> chapters = new List<Chapter>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MP4File"/> class for the specified file.
@@ -364,6 +365,14 @@ namespace Knuckleball
         }
 
         /// <summary>
+        /// Gets the list of chapters for this file.
+        /// </summary>
+        public IList<Chapter> Chapters
+        {
+            get { return this.chapters; }
+        }
+
+        /// <summary>
         /// Reads the tags from the specified file.
         /// </summary>
         public void ReadTags()
@@ -433,6 +442,8 @@ namespace Knuckleball
             this.RatingInfo = ReadRawAtom<RatingInfo>(fileHandle);
             this.MovieInfo = ReadRawAtom<MovieInfo>(fileHandle);
 
+            this.ReadChapters(fileHandle);
+            
             NativeMethods.MP4Close(fileHandle);
         }
 
@@ -715,6 +726,8 @@ namespace Knuckleball
             // }
             WriteRawAtom<MovieInfo>(fileHandle, this.MovieInfo);
 
+            this.WriteChapters(fileHandle);
+
             NativeMethods.MP4Close(fileHandle);
         }
 
@@ -962,6 +975,89 @@ namespace Knuckleball
                     Marshal.FreeHGlobal(trackPtr);
                 }
             }
+        }
+
+        private void ReadChapters(IntPtr fileHandle)
+        {
+            this.chapters.Clear();
+            IntPtr chapterListPointer = IntPtr.Zero;
+            int chapterCount = 0;
+            NativeMethods.MP4GetChapters(fileHandle, ref chapterListPointer, ref chapterCount, NativeMethods.MP4ChapterType.Qt);
+            if (chapterListPointer != IntPtr.Zero)
+            {
+                IntPtr currentChapterPointer = chapterListPointer;
+                for (int i = 0; i < chapterCount; i++)
+                {
+                    NativeMethods.MP4Chapter currentChapter = currentChapterPointer.ReadStructure<NativeMethods.MP4Chapter>();
+                    TimeSpan duration = TimeSpan.FromMilliseconds(currentChapter.duration);
+                    string title = Encoding.UTF8.GetString(currentChapter.title);
+                    if ((currentChapter.title[0] == 0xFE && currentChapter.title[1] == 0xFF) ||
+                        (currentChapter.title[0] == 0xFF && currentChapter.title[1] == 0xFE))
+                    {
+                        title = Encoding.Unicode.GetString(currentChapter.title);
+                    }
+
+                    title = title.Substring(0, title.IndexOf('\0'));
+                    this.chapters.Add(new Chapter() { Duration = duration, Title = title });
+                    currentChapterPointer = IntPtr.Add(currentChapterPointer, Marshal.SizeOf(currentChapter));
+                }
+
+                NativeMethods.MP4Free(chapterListPointer);
+            }
+        }
+
+        private void WriteChapters(IntPtr fileHandle)
+        {
+            IntPtr chapterList = IntPtr.Zero;
+            int chapterCount = 0;
+            NativeMethods.MP4GetChapters(fileHandle, ref chapterList, ref chapterCount, NativeMethods.MP4ChapterType.Qt);
+            NativeMethods.MP4DeleteChapters(fileHandle, NativeMethods.MP4ChapterType.Any, NativeMethods.MP4InvalidTrackId);
+
+            int maxTrackId = 0;
+            int referenceTrackId = -1;
+            for (short i = 0; i < NativeMethods.MP4GetNumberOfTracks(fileHandle, null, 0); i++)
+            {
+                maxTrackId = NativeMethods.MP4FindTrackId(fileHandle, i, null, 0);
+                string trackType = NativeMethods.MP4GetTrackType(fileHandle, maxTrackId);
+                if (trackType == NativeMethods.MP4VideoTrackType && referenceTrackId < 0)
+                {
+                    referenceTrackId = maxTrackId;
+                }
+
+                if (NativeMethods.MP4HaveTrackAtom(fileHandle, maxTrackId, "tref.chap"))
+                {
+                    // Subler does some work here to remove references to 
+                    // the chapter track that other tracks may have. If/when
+                    // the Subler changes to the mp4v2 library are merged,
+                    // we will consider doing that here.
+                }
+            }
+
+            NativeMethods.MP4SetIntegerProperty(fileHandle, "moov.mvhd.nextTrackId", maxTrackId + 1);
+            referenceTrackId = referenceTrackId <= 0 ? 1 : referenceTrackId;
+            long referenceTrackDuration = NativeMethods.MP4ConvertFromTrackDuration(fileHandle, referenceTrackId, NativeMethods.MP4GetTrackDuration(fileHandle, referenceTrackId), NativeMethods.MP4TimeScale.Milliseconds);
+
+            long total = 0;
+            List<NativeMethods.MP4Chapter> nativeChapters = new List<NativeMethods.MP4Chapter>();
+            foreach (Chapter chapter in this.chapters)
+            {
+                NativeMethods.MP4Chapter nativeChapter = new NativeMethods.MP4Chapter();
+                nativeChapter.title = new byte[1024];
+                byte[] titleByteArray = Encoding.UTF8.GetBytes(chapter.Title);
+                Array.Copy(titleByteArray, nativeChapter.title, titleByteArray.Length);
+                long chapterLength = (long)chapter.Duration.TotalMilliseconds;
+                nativeChapter.duration = total + chapterLength > referenceTrackDuration ? referenceTrackDuration - total : chapterLength;
+                total += chapterLength;
+                nativeChapters.Add(nativeChapter);
+                if (total > referenceTrackDuration)
+                {
+                    break;
+                }
+            }
+
+            NativeMethods.MP4Chapter[] chapterArray = nativeChapters.ToArray();
+            NativeMethods.MP4SetChapters(fileHandle, chapterArray, chapterArray.Length, NativeMethods.MP4ChapterType.Qt);
+            NativeMethods.MP4Free(chapterList);
         }
     }
 }

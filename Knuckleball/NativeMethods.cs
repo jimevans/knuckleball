@@ -27,6 +27,56 @@ namespace Knuckleball
     internal class NativeMethods
     {
         /// <summary>
+        /// Invalid track ID
+        /// </summary>
+        internal const int MP4InvalidTrackId = 0;
+
+        /// <summary>
+        /// Od track type
+        /// </summary>
+        internal const string MP4OdTrackType = "odsm";
+
+        /// <summary>
+        /// Scene track type
+        /// </summary>
+        internal const string MP4SceneTrackType = "sdsm";
+
+        /// <summary>
+        /// Audio track type
+        /// </summary>
+        internal const string MP4AudioTrackType = "soun";
+
+        /// <summary>
+        /// Video track type
+        /// </summary>
+        internal const string MP4VideoTrackType = "vide";
+
+        /// <summary>
+        /// Hint track type
+        /// </summary>
+        internal const string MP4HintTrackType = "hint";
+
+        /// <summary>
+        /// Control track type
+        /// </summary>
+        internal const string MP4ControlTrackType = "cntl";
+
+        /// <summary>
+        /// Text track type
+        /// </summary>
+        internal const string MP4TextTrackType = "text";
+
+        /// <summary>
+        /// Subtitle track type
+        /// </summary>
+        internal const string MP4SubtitleTrackType = "sbtl";
+
+        /// <summary>
+        /// Sub-picture track type
+        /// </summary>
+        internal const string MP4SubpictureTrackType = "subp";
+
+        /// <summary>
         /// Prevents a default instance of the <see cref="NativeMethods"/> class from being created.
         /// </summary>
         private NativeMethods()
@@ -222,6 +272,71 @@ namespace Knuckleball
             Png = 4
         }
 
+        /// <summary>
+        /// Represents the known types used for chapters.
+        /// </summary>
+        /// <remarks>
+        /// These values are taken from the MP4V2 header files, documented thus:
+        /// <para>
+        /// <code>
+        /// typedef enum {
+        ///     MP4ChapterTypeNone = 0,
+        ///     MP4ChapterTypeAny  = 1,
+        ///     MP4ChapterTypeQt   = 2,
+        ///     MP4ChapterTypeNero = 4 
+        /// } MP4ChapterType;
+        /// </code>
+        /// </para>
+        /// </remarks>
+        internal enum MP4ChapterType
+        {
+            /// <summary>
+            /// No chapters found return value
+            /// </summary>
+            None = 0,
+
+            /// <summary>
+            /// Any or all known chapter types
+            /// </summary>
+            Any = 1,
+
+            /// <summary>
+            /// QuickTime chapter type
+            /// </summary>
+            Qt = 2,
+
+            /// <summary>
+            /// Nero chapter type
+            /// </summary>
+            Nero = 4
+        }
+
+        /// <summary>
+        /// Values representing the time scale for a track
+        /// </summary>
+        internal enum MP4TimeScale
+        {
+            /// <summary>
+            /// Track duration is measured in seconds.
+            /// </summary>
+            Seconds = 1,
+
+            /// <summary>
+            /// Track duration is measured in milliseconds.
+            /// </summary>
+            Milliseconds = 1000,
+
+            /// <summary>
+            /// Track duration is measured in microseconds.
+            /// </summary>
+            Microseconds = 1000000,
+
+            /// <summary>
+            /// Track duration is measured in nanoseconds.
+            /// </summary>
+            Nanoseconds = 100000000
+        }
+
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         internal static extern IntPtr MP4TagsAlloc();
 
@@ -249,6 +364,9 @@ namespace Knuckleball
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         internal static extern void MP4Close(IntPtr file);
+
+        [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void MP4Free(IntPtr pointer);
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
@@ -475,6 +593,41 @@ namespace Knuckleball
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
         internal static extern bool MP4ItmfRemoveItem(IntPtr hFile, IntPtr item);
+
+        [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern int MP4GetNumberOfTracks(IntPtr hFile, [MarshalAs(UnmanagedType.LPStr)]string type, byte subType);
+
+        [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern int MP4FindTrackId(IntPtr hFile, short index, [MarshalAs(UnmanagedType.LPStr)]string type, byte subType);
+
+        [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern string MP4GetTrackType(IntPtr hFile, int trackId);
+
+        [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern long MP4ConvertFromTrackDuration(IntPtr hFile, int trackId, long duration, MP4TimeScale timeScale);
+
+        [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern long MP4GetTrackDuration(IntPtr hFile, int trackId);
+
+        [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        internal static extern bool MP4HaveTrackAtom(IntPtr hFile, int trackId, [MarshalAs(UnmanagedType.LPStr)]string atomName);
+
+        [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        internal static extern bool MP4SetIntegerProperty(IntPtr hFile, [MarshalAs(UnmanagedType.LPStr)]string propName, long value);
+
+        [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I4)]
+        internal static extern MP4ChapterType MP4GetChapters(IntPtr hFile, ref IntPtr chapterList, ref int chapterCount, MP4ChapterType chapterType);
+
+        [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I4)]
+        internal static extern MP4ChapterType MP4SetChapters(IntPtr hFile, [In, Out]MP4Chapter[] chapterList, int chapterCount, MP4ChapterType chapterType);
+
+        [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I4)]
+        internal static extern MP4ChapterType MP4DeleteChapters(IntPtr hFile, MP4ChapterType chapterType, int chapterTrackId);
 
         /// <summary>
         /// Models an iTunes Metadata Format data atom contained in an iTMF metadata item atom.
@@ -723,6 +876,37 @@ namespace Knuckleball
             /// Total number of discs
             /// </summary>
             internal short total;
+        }
+
+        /// <summary>
+        /// Represents information for a chapter in this file.
+        /// </summary>
+        /// <remarks>
+        /// This structure definition is taken from the MP4V2 header files, documented thus:
+        /// <para>
+        /// <code>
+        /// #define MP4V2_CHAPTER_TITLE_MAX 1023
+        ///
+        /// typedef struct MP4Chapter_s {
+        ///     MP4Duration duration;
+        ///     char title[MP4V2_CHAPTER_TITLE_MAX+1];
+        /// } MP4Chapter_t;
+        /// </code>
+        /// </para>
+        /// </remarks>
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct MP4Chapter
+        {
+            /// <summary>
+            /// Duration of chapter in milliseconds
+            /// </summary>
+            internal long duration;
+
+            /// <summary>
+            /// Title of chapter
+            /// </summary>
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 1024)]
+            internal byte[] title;
         }
 
         /// <summary>

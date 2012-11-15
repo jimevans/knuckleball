@@ -67,6 +67,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ChapterTests.cs" />
     <Compile Include="TagWritingTests.cs" />
     <Compile Include="IntPtrExtensionTests.cs" />
     <Compile Include="MovieReadTagTests.cs" />
@@ -82,6 +83,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="TestFiles\Chapter.m4v">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="TestFiles\Movie.m4v">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
