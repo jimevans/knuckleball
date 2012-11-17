@@ -982,8 +982,8 @@ namespace Knuckleball
             this.chapters.Clear();
             IntPtr chapterListPointer = IntPtr.Zero;
             int chapterCount = 0;
-            NativeMethods.MP4GetChapters(fileHandle, ref chapterListPointer, ref chapterCount, NativeMethods.MP4ChapterType.Qt);
-            if (chapterListPointer != IntPtr.Zero)
+            NativeMethods.MP4ChapterType chapterType = NativeMethods.MP4GetChapters(fileHandle, ref chapterListPointer, ref chapterCount, NativeMethods.MP4ChapterType.Qt);
+            if (chapterType != NativeMethods.MP4ChapterType.None && chapterCount != 0)
             {
                 IntPtr currentChapterPointer = chapterListPointer;
                 for (int i = 0; i < chapterCount; i++)
@@ -1001,55 +1001,67 @@ namespace Knuckleball
                     this.chapters.Add(new Chapter() { Duration = duration, Title = title });
                     currentChapterPointer = IntPtr.Add(currentChapterPointer, Marshal.SizeOf(currentChapter));
                 }
+            }
+            else
+            {
+                int timeScale = NativeMethods.MP4GetTimeScale(fileHandle);
+                long duration = NativeMethods.MP4GetDuration(fileHandle);
+                this.chapters.Add(new Chapter() { Duration = TimeSpan.FromSeconds(duration / timeScale), Title = "Chapter 1" });
+            }
 
+            if (chapterListPointer != IntPtr.Zero)
+            {
                 NativeMethods.MP4Free(chapterListPointer);
             }
         }
 
         private void WriteChapters(IntPtr fileHandle)
         {
-            IntPtr chapterList = IntPtr.Zero;
-            int chapterCount = 0;
-            NativeMethods.MP4GetChapters(fileHandle, ref chapterList, ref chapterCount, NativeMethods.MP4ChapterType.Qt);
-            NativeMethods.MP4DeleteChapters(fileHandle, NativeMethods.MP4ChapterType.Any, NativeMethods.MP4InvalidTrackId);
-
-            int maxTrackId = 0;
+            // Find the first video track, so that we make sure the total duration
+            // of the chapters we add does not exceed the length of the file.
             int referenceTrackId = -1;
             for (short i = 0; i < NativeMethods.MP4GetNumberOfTracks(fileHandle, null, 0); i++)
             {
-                maxTrackId = NativeMethods.MP4FindTrackId(fileHandle, i, null, 0);
-                string trackType = NativeMethods.MP4GetTrackType(fileHandle, maxTrackId);
-                if (trackType == NativeMethods.MP4VideoTrackType && referenceTrackId < 0)
+                int currentTrackId = NativeMethods.MP4FindTrackId(fileHandle, i, null, 0);
+                string trackType = NativeMethods.MP4GetTrackType(fileHandle, currentTrackId);
+                if (trackType == NativeMethods.MP4VideoTrackType)
                 {
-                    referenceTrackId = maxTrackId;
-                }
-
-                if (NativeMethods.MP4HaveTrackAtom(fileHandle, maxTrackId, "tref.chap"))
-                {
-                    // Subler does some work here to remove references to 
-                    // the chapter track that other tracks may have. If/when
-                    // the Subler changes to the mp4v2 library are merged,
-                    // we will consider doing that here.
+                    referenceTrackId = currentTrackId;
+                    break;
                 }
             }
 
-            NativeMethods.MP4SetIntegerProperty(fileHandle, "moov.mvhd.nextTrackId", maxTrackId + 1);
+            // If we don't have a video track, then we have an audio file, which has
+            // only one track, and we can use it to find the duration.
             referenceTrackId = referenceTrackId <= 0 ? 1 : referenceTrackId;
             long referenceTrackDuration = NativeMethods.MP4ConvertFromTrackDuration(fileHandle, referenceTrackId, NativeMethods.MP4GetTrackDuration(fileHandle, referenceTrackId), NativeMethods.MP4TimeScale.Milliseconds);
 
-            long total = 0;
+            long runningTotal = 0;
             List<NativeMethods.MP4Chapter> nativeChapters = new List<NativeMethods.MP4Chapter>();
             foreach (Chapter chapter in this.chapters)
             {
                 NativeMethods.MP4Chapter nativeChapter = new NativeMethods.MP4Chapter();
+
+                // Set the title
                 nativeChapter.title = new byte[1024];
                 byte[] titleByteArray = Encoding.UTF8.GetBytes(chapter.Title);
                 Array.Copy(titleByteArray, nativeChapter.title, titleByteArray.Length);
+
+                // Set the duration, making sure that we only use durations up to
+                // the length of the reference track.
                 long chapterLength = (long)chapter.Duration.TotalMilliseconds;
-                nativeChapter.duration = total + chapterLength > referenceTrackDuration ? referenceTrackDuration - total : chapterLength;
-                total += chapterLength;
+                if (runningTotal + chapterLength > referenceTrackDuration)
+                {
+                    nativeChapter.duration = referenceTrackDuration - runningTotal;
+                }
+                else
+                {
+                    nativeChapter.duration = chapterLength;
+                }
+
+                runningTotal += chapterLength;
                 nativeChapters.Add(nativeChapter);
-                if (total > referenceTrackDuration)
+                if (runningTotal > referenceTrackDuration)
                 {
                     break;
                 }
@@ -1057,7 +1069,6 @@ namespace Knuckleball
 
             NativeMethods.MP4Chapter[] chapterArray = nativeChapters.ToArray();
             NativeMethods.MP4SetChapters(fileHandle, chapterArray, chapterArray.Length, NativeMethods.MP4ChapterType.Qt);
-            NativeMethods.MP4Free(chapterList);
         }
     }
 }

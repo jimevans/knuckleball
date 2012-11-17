@@ -609,14 +609,6 @@ namespace Knuckleball
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         internal static extern long MP4GetTrackDuration(IntPtr hFile, int trackId);
 
-        [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.U1)]
-        internal static extern bool MP4HaveTrackAtom(IntPtr hFile, int trackId, [MarshalAs(UnmanagedType.LPStr)]string atomName);
-
-        [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.U1)]
-        internal static extern bool MP4SetIntegerProperty(IntPtr hFile, [MarshalAs(UnmanagedType.LPStr)]string propName, long value);
-
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.I4)]
         internal static extern MP4ChapterType MP4GetChapters(IntPtr hFile, ref IntPtr chapterList, ref int chapterCount, MP4ChapterType chapterType);
@@ -626,8 +618,10 @@ namespace Knuckleball
         internal static extern MP4ChapterType MP4SetChapters(IntPtr hFile, [In, Out]MP4Chapter[] chapterList, int chapterCount, MP4ChapterType chapterType);
 
         [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.I4)]
-        internal static extern MP4ChapterType MP4DeleteChapters(IntPtr hFile, MP4ChapterType chapterType, int chapterTrackId);
+        internal static extern long MP4GetDuration(IntPtr hFile);
+
+        [DllImport("libMP4V2.dll", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern int MP4GetTimeScale(IntPtr hFile);
 
         /// <summary>
         /// Models an iTunes Metadata Format data atom contained in an iTMF metadata item atom.
