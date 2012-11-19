@@ -67,11 +67,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ChapterListTests.cs" />
     <Compile Include="ChapterTests.cs" />
     <Compile Include="TagWritingTests.cs" />
     <Compile Include="IntPtrExtensionTests.cs" />
     <Compile Include="MovieReadTagTests.cs" />
-    <Compile Include="TestFileUtilities.cs" />
+    <Compile Include="TestUtilities.cs" />
     <Compile Include="MP4FileTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TVEpisodeReadTagTests.cs" />

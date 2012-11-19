@@ -6,13 +6,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using NUnit.Framework;
-using System.Security.Cryptography;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using NUnit.Framework;
 
 namespace Knuckleball.Tests
 {
@@ -33,7 +33,7 @@ namespace Knuckleball.Tests
 
         private void CopyNewTestFile()
         {
-            string directory = TestFileUtilities.GetTestFileDirectory();
+            string directory = TestUtilities.GetTestFileDirectory();
             string fileName = Path.Combine(directory, "Chapter.m4v");
             this.fileCopy = Path.Combine(directory, "ChapterCopy.m4v");
             File.Copy(fileName, this.fileCopy, true);

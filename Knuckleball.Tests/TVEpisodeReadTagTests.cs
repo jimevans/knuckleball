@@ -27,7 +27,7 @@ namespace Knuckleball.Tests
         [TestFixtureSetUp]
         public void SetUp()
         {
-            string directory = TestFileUtilities.GetTestFileDirectory();
+            string directory = TestUtilities.GetTestFileDirectory();
             string fileName = Path.Combine(directory, "TVEpisode.m4v");
             this.file = MP4File.Open(fileName);
         }
@@ -180,7 +180,7 @@ namespace Knuckleball.Tests
         public void ShouldReadArtwork()
         {
             Assert.AreEqual(ImageFormat.Jpeg, file.Tags.ArtworkFormat);
-            Assert.AreEqual("5527201a6235d454c7e7f724e803e700", ComputeHash(file.Tags.Artwork, file.Tags.ArtworkFormat));
+            Assert.AreEqual("5527201a6235d454c7e7f724e803e700", TestUtilities.ComputeHash(file.Tags.Artwork, file.Tags.ArtworkFormat));
         }
 
         [Test]
@@ -343,19 +343,6 @@ namespace Knuckleball.Tests
         public void ShouldReadTVNetwork()
         {
             Assert.IsNull(file.Tags.TVNetwork);
-        }
-
-        private string ComputeHash(Image image, ImageFormat format)
-        {
-            byte[] buffer;
-            MemoryStream stream = new MemoryStream();
-            image.Save(stream, format);
-            buffer = stream.ToArray();
-
-            MD5 md5 = MD5.Create();
-            byte[] hash = md5.ComputeHash(buffer);
-            string hashString = BitConverter.ToString(hash).ToLower().Replace("-", string.Empty);
-            return hashString;
         }
     }
 }

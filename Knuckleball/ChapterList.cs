@@ -26,10 +26,11 @@ namespace Knuckleball
     /// Represents the collection of chapters in a file, tracking whether there have
     /// been changes made to the collection.
     /// </summary>
-    [SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Justification="ChapterList object has List (ordered) semantics, so a suffix of List is correct.")]
+    [SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Justification = "ChapterList object has List (ordered) semantics, so a suffix of List is correct.")]
     public sealed class ChapterList : IList<Chapter>
     {
         private List<Chapter> chapters = new List<Chapter>();
+        private HashSet<Guid> hashedIndex = new HashSet<Guid>();
 
         /// <summary>
         /// Prevents a default instance of the <see cref="ChapterList"/> class from being created.
@@ -64,6 +65,8 @@ namespace Knuckleball
         /// </summary>
         /// <param name="index">The zero-based index of the <see cref="Chapter"/> to get or set.</param>
         /// <returns>The <see cref="Chapter"/> at the specified index.</returns>
+        /// <exception cref="ArgumentNullException">value to be set is <see langword="null"/></exception>
+        /// <exception cref="ArgumentException">value to be set is already in the list</exception>
         public Chapter this[int index]
         {
             get
@@ -73,7 +76,19 @@ namespace Knuckleball
 
             set
             {
+                if (value == null)
+                {
+                    throw new ArgumentNullException("value");
+                }
+
+                if (this.hashedIndex.Contains(value.Id))
+                {
+                    throw new ArgumentException("Chapter is already in the chapter list", "value");
+                }
+
                 this.chapters[index] = value;
+                value.Changed += new EventHandler(this.OnChapterChanged);
+                this.hashedIndex.Add(value.Id);
                 this.IsDirty = true;
             }
         }
@@ -83,6 +98,7 @@ namespace Knuckleball
         /// </summary>
         /// <param name="item">The <see cref="Chapter"/> to add.</param>
         /// <exception cref="ArgumentNullException"><paramref name="item"/> is <see langword="null"/></exception>
+        /// <exception cref="ArgumentException"><paramref name="item"/> is already in the list</exception>
         public void Add(Chapter item)
         {
             if (item == null)
@@ -90,7 +106,14 @@ namespace Knuckleball
                 throw new ArgumentNullException("item");
             }
 
+            if (this.hashedIndex.Contains(item.Id))
+            {
+                throw new ArgumentException("Chapter is already in the chapter list", "item");
+            }
+
             this.chapters.Add(item);
+            item.Changed += new EventHandler(this.OnChapterChanged);
+            this.hashedIndex.Add(item.Id);
             this.IsDirty = true;
         }
 
@@ -99,8 +122,12 @@ namespace Knuckleball
         /// </summary>
         public void Clear()
         {
-            this.chapters.Clear();
-            this.IsDirty = true;
+            if (this.Count > 0)
+            {
+                this.hashedIndex.Clear();
+                this.chapters.Clear();
+                this.IsDirty = true;
+            }
         }
 
         /// <summary>
@@ -111,7 +138,7 @@ namespace Knuckleball
         /// otherwise, <see langword="false"/>.</returns>
         public bool Contains(Chapter item)
         {
-            return this.chapters.Contains(item);
+            return this.hashedIndex.Contains(item.Id);
         }
 
         /// <summary>
@@ -138,6 +165,11 @@ namespace Knuckleball
         /// <returns>The index of <paramref name="item"/> if found in the list; otherwise, -1.</returns>
         public int IndexOf(Chapter item)
         {
+            if (!this.hashedIndex.Contains(item.Id))
+            {
+                return -1;
+            }
+
             return this.chapters.IndexOf(item);
         }
 
@@ -149,6 +181,7 @@ namespace Knuckleball
         /// <exception cref="ArgumentNullException"><paramref name="item"/> is <see langword="null"/></exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than 0, 
         /// or <paramref name="index"/> is greater than <see cref="Count"/>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="item"/> is alrady in the list</exception>
         public void Insert(int index, Chapter item)
         {
             if (item == null)
@@ -156,7 +189,14 @@ namespace Knuckleball
                 throw new ArgumentNullException("item");
             }
 
+            if (this.hashedIndex.Contains(item.Id))
+            {
+                throw new ArgumentException("Chapter is already in the chapter list", "item");
+            }
+
             this.chapters.Insert(index, item);
+            item.Changed += new EventHandler(this.OnChapterChanged);
+            this.hashedIndex.Add(item.Id);
             this.IsDirty = true;
         }
 
@@ -171,6 +211,12 @@ namespace Knuckleball
         {
             bool isRemoved = this.chapters.Remove(item);
             this.IsDirty = this.IsDirty || isRemoved;
+            if (isRemoved)
+            {
+                item.Changed -= new EventHandler(this.OnChapterChanged);
+                this.hashedIndex.Remove(item.Id);
+            }
+
             return isRemoved;
         }
 
@@ -178,8 +224,13 @@ namespace Knuckleball
         /// Removes the <see cref="Chapter"/> at the specified index.
         /// </summary>
         /// <param name="index">The zero-based index of the <see cref="Chapter"/> to remove.</param>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than 0, 
+        /// or <paramref name="index"/> is greater than <see cref="Count"/>.</exception>
         public void RemoveAt(int index)
         {
+            Chapter toRemove = this[index];
+            this.hashedIndex.Remove(toRemove.Id);
+            toRemove.Changed -= new EventHandler(this.OnChapterChanged);
             this.chapters.RemoveAt(index);
             this.IsDirty = true;
         }
@@ -231,7 +282,7 @@ namespace Knuckleball
                     }
 
                     title = title.Substring(0, title.IndexOf('\0'));
-                    list.chapters.Add(new Chapter() { Duration = duration, Title = title });
+                    list.AddInternal(new Chapter() { Duration = duration, Title = title });
                     currentChapterPointer = IntPtr.Add(currentChapterPointer, Marshal.SizeOf(currentChapter));
                 }
             }
@@ -239,7 +290,7 @@ namespace Knuckleball
             {
                 int timeScale = NativeMethods.MP4GetTimeScale(fileHandle);
                 long duration = NativeMethods.MP4GetDuration(fileHandle);
-                list.chapters.Add(new Chapter() { Duration = TimeSpan.FromSeconds(duration / timeScale), Title = "Chapter 1" });
+                list.AddInternal(new Chapter() { Duration = TimeSpan.FromSeconds(duration / timeScale), Title = "Chapter 1" });
             }
 
             if (chapterListPointer != IntPtr.Zero)
@@ -316,6 +367,22 @@ namespace Knuckleball
                 NativeMethods.MP4Chapter[] chapterArray = nativeChapters.ToArray();
                 NativeMethods.MP4SetChapters(fileHandle, chapterArray, chapterArray.Length, NativeMethods.MP4ChapterType.Qt);
             }
+        }
+
+        /// <summary>
+        /// Adds a <see cref="Chapter"/> to the list without dirtying the list.
+        /// </summary>
+        /// <param name="toAdd">The <see cref="Chapter"/> to add to the list.</param>
+        private void AddInternal(Chapter toAdd)
+        {
+            this.chapters.Add(toAdd);
+            toAdd.Changed += new EventHandler(this.OnChapterChanged);
+            this.hashedIndex.Add(toAdd.Id);
+        }
+
+        private void OnChapterChanged(object sender, EventArgs e)
+        {
+            this.IsDirty = true;
         }
     }
 }

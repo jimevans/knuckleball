@@ -6,13 +6,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using NUnit.Framework;
-using System.Security.Cryptography;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using NUnit.Framework;
 
 namespace Knuckleball.Tests
 {
@@ -27,7 +27,7 @@ namespace Knuckleball.Tests
         [TestFixtureSetUp]
         public void SetUp()
         {
-            string directory = TestFileUtilities.GetTestFileDirectory();
+            string directory = TestUtilities.GetTestFileDirectory();
             string fileName = Path.Combine(directory, "Movie.m4v");
             this.file = MP4File.Open(fileName);
         }
@@ -182,7 +182,7 @@ namespace Knuckleball.Tests
         public void ShouldReadArtwork()
         {
             Assert.AreEqual(file.Tags.ArtworkFormat, ImageFormat.Png);
-            Assert.AreEqual("c1b2758c370db440aa48ff3a7519ff24", ComputeHash(file.Tags.Artwork, file.Tags.ArtworkFormat));
+            Assert.AreEqual("c1b2758c370db440aa48ff3a7519ff24", TestUtilities.ComputeHash(file.Tags.Artwork, file.Tags.ArtworkFormat));
         }
 
         [Test]
@@ -349,21 +349,6 @@ namespace Knuckleball.Tests
         public void ShouldReadTVNetwork()
         {
             Assert.IsNull(file.Tags.TVNetwork);
-        }
-
-        private string ComputeHash(Image image, ImageFormat format)
-        {
-            byte[] buffer;
-            using (MemoryStream stream = new MemoryStream())
-            {
-                image.Save(stream, format);
-                buffer = stream.ToArray();
-            }
-
-            MD5 md5 = MD5.Create();
-            byte[] hash = md5.ComputeHash(buffer);
-            string hashString = BitConverter.ToString(hash).ToLower().Replace("-", string.Empty);
-            return hashString;
         }
     }
 }

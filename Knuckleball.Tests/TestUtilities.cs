@@ -5,18 +5,20 @@
 // -----------------------------------------------------------------------
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.IO;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Knuckleball.Tests
 {
-
     /// <summary>
     /// TODO: Update summary.
     /// </summary>
-    public class TestFileUtilities
+    public class TestUtilities
     {
         private const string TestFilesDirectoryName = "TestFiles";
 
@@ -42,6 +44,21 @@ namespace Knuckleball.Tests
             }
 
             return Path.Combine(Path.GetDirectoryName(currentDirectory), TestFilesDirectoryName);
+        }
+
+        public static string ComputeHash(Image image, ImageFormat format)
+        {
+            byte[] buffer;
+            using (MemoryStream stream = new MemoryStream())
+            {
+                image.Save(stream, format);
+                buffer = stream.ToArray();
+            }
+
+            MD5 md5 = MD5.Create();
+            byte[] hash = md5.ComputeHash(buffer);
+            string hashString = BitConverter.ToString(hash).ToLower().Replace("-", string.Empty);
+            return hashString;
         }
     }
 }

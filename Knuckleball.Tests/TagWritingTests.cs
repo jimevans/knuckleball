@@ -34,7 +34,7 @@ namespace Knuckleball.Tests
 
         private void CopyNewTestFile()
         {
-            string directory = TestFileUtilities.GetTestFileDirectory();
+            string directory = TestUtilities.GetTestFileDirectory();
             string fileName = Path.Combine(directory, "TVEpisode.m4v");
             this.fileCopy = Path.Combine(directory, "TVEpisodeCopy.m4v");
             File.Copy(fileName, this.fileCopy, true);
@@ -327,13 +327,13 @@ namespace Knuckleball.Tests
         [Test]
         public void ShouldWriteArtwork()
         {
-            Image newArtwork = Image.FromFile(Path.Combine(TestFileUtilities.GetTestFileDirectory(), "NewArtwork.png"));
+            Image newArtwork = Image.FromFile(Path.Combine(TestUtilities.GetTestFileDirectory(), "NewArtwork.png"));
             this.file.Tags.Artwork = newArtwork;
             this.file.Save();
 
             this.file.Load();
             Assert.AreEqual(1, this.file.Tags.ArtworkCount);
-            Assert.AreEqual("577f318762da53a41aa57d43ba6480ea", this.ComputeHash(this.file.Tags.Artwork, this.file.Tags.ArtworkFormat));
+            Assert.AreEqual("577f318762da53a41aa57d43ba6480ea", TestUtilities.ComputeHash(this.file.Tags.Artwork, this.file.Tags.ArtworkFormat));
 
             this.file.Tags.Artwork = null;
             this.file.Save();
@@ -634,21 +634,6 @@ namespace Knuckleball.Tests
 
             // Test that we can write a null value to the tag too.
             RunSetValueTest("TVNetwork", null);
-        }
-
-        private string ComputeHash(Image image, ImageFormat format)
-        {
-            byte[] buffer;
-            using (MemoryStream stream = new MemoryStream())
-            {
-                image.Save(stream, format);
-                buffer = stream.ToArray();
-            }
-
-            MD5 md5 = MD5.Create();
-            byte[] hash = md5.ComputeHash(buffer);
-            string hashString = BitConverter.ToString(hash).ToLower().Replace("-", string.Empty);
-            return hashString;
         }
     }
 }

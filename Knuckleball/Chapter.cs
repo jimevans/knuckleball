@@ -25,15 +25,62 @@ namespace Knuckleball
     /// </summary>
     public class Chapter
     {
+        private Guid id = Guid.NewGuid();
+        private string title = string.Empty;
+        private TimeSpan duration = TimeSpan.FromSeconds(0);
+
+        /// <summary>
+        /// Occurs when the value of any property is changed.
+        /// </summary>
+        internal event EventHandler Changed;
+
         /// <summary>
         /// Gets or sets the title of this chapter.
         /// </summary>
-        public string Title { get; set; }
+        public string Title 
+        {
+            get
+            {
+                return this.title; 
+            }
+
+            set
+            {
+                if (this.title != value)
+                {
+                    this.title = value;
+                    this.OnChanged(new EventArgs());
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or sets the duration of this chapter.
         /// </summary>
-        public TimeSpan Duration { get; set; }
+        public TimeSpan Duration
+        {
+            get
+            {
+                return this.duration;
+            }
+
+            set
+            {
+                if (this.duration != value)
+                {
+                    this.duration = value;
+                    this.OnChanged(new EventArgs());
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the internal ID of this Chapter.
+        /// </summary>
+        internal Guid Id
+        {
+            get { return this.id; }
+        }
 
         /// <summary>
         /// Returns the string representation of this chapter.
@@ -74,6 +121,18 @@ namespace Knuckleball
             }
 
             return this.Title == other.Title && this.Duration == other.Duration;
+        }
+
+        /// <summary>
+        /// Raises the <see cref="Changed"/> event.
+        /// </summary>
+        /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
+        protected void OnChanged(EventArgs e)
+        {
+            if (this.Changed != null)
+            {
+                this.Changed(this, e);
+            }
         }
     }
 }
