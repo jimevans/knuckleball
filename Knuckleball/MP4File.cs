@@ -27,11 +27,11 @@ namespace Knuckleball
     /// <summary>
     /// Represents an instance of an MP4 file.
     /// </summary>
-    public class MP4File : IDisposable
+    public class MP4File
     {
         private string fileName;
-        private List<Chapter> chapters = new List<Chapter>();
         private MetadataTags metadataTags;
+        private ChapterList chapters;
 
         /// <summary>
         /// Prevents a default instance of the <see cref="MP4File"/> class from being created.
@@ -57,7 +57,7 @@ namespace Knuckleball
         /// <summary>
         /// Gets the list of chapters for this file.
         /// </summary>
-        public IList<Chapter> Chapters
+        public ChapterList Chapters
         {
             get { return this.chapters; }
         }
@@ -95,8 +95,8 @@ namespace Knuckleball
             {
                 try
                 {
-                    this.metadataTags = MetadataTags.Read(fileHandle);
-                    this.ReadChapters(fileHandle);
+                    this.metadataTags = MetadataTags.ReadFromFile(fileHandle);
+                    this.chapters = ChapterList.ReadFromFile(fileHandle);
                 }
                 finally
                 {
@@ -115,129 +115,14 @@ namespace Knuckleball
             {
                 try
                 {
-                    this.metadataTags.Write(fileHandle);
-                    this.WriteChapters(fileHandle);
+                    this.metadataTags.WriteToFile(fileHandle);
+                    this.chapters.WriteToFile(fileHandle);
                 }
                 finally
                 {
                     NativeMethods.MP4Close(fileHandle);
                 }
             }
-        }
-
-        /// <summary>
-        /// Releases all managed and unmanaged resources referenced by this instance.
-        /// </summary>
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Releases all managed and unmanaged resources referenced by this instance.
-        /// </summary>
-        /// <param name="disposing"><see langword="true"/> to dispose of managed and unmanaged resources;
-        /// <see cref="false"/> to dispose of only unmanaged resources.</param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-            }
-        }
-
-        private void ReadChapters(IntPtr fileHandle)
-        {
-            this.chapters.Clear();
-            IntPtr chapterListPointer = IntPtr.Zero;
-            int chapterCount = 0;
-            NativeMethods.MP4ChapterType chapterType = NativeMethods.MP4GetChapters(fileHandle, ref chapterListPointer, ref chapterCount, NativeMethods.MP4ChapterType.Qt);
-            if (chapterType != NativeMethods.MP4ChapterType.None && chapterCount != 0)
-            {
-                IntPtr currentChapterPointer = chapterListPointer;
-                for (int i = 0; i < chapterCount; i++)
-                {
-                    NativeMethods.MP4Chapter currentChapter = currentChapterPointer.ReadStructure<NativeMethods.MP4Chapter>();
-                    TimeSpan duration = TimeSpan.FromMilliseconds(currentChapter.duration);
-                    string title = Encoding.UTF8.GetString(currentChapter.title);
-                    if ((currentChapter.title[0] == 0xFE && currentChapter.title[1] == 0xFF) ||
-                        (currentChapter.title[0] == 0xFF && currentChapter.title[1] == 0xFE))
-                    {
-                        title = Encoding.Unicode.GetString(currentChapter.title);
-                    }
-
-                    title = title.Substring(0, title.IndexOf('\0'));
-                    this.chapters.Add(new Chapter() { Duration = duration, Title = title });
-                    currentChapterPointer = IntPtr.Add(currentChapterPointer, Marshal.SizeOf(currentChapter));
-                }
-            }
-            else
-            {
-                int timeScale = NativeMethods.MP4GetTimeScale(fileHandle);
-                long duration = NativeMethods.MP4GetDuration(fileHandle);
-                this.chapters.Add(new Chapter() { Duration = TimeSpan.FromSeconds(duration / timeScale), Title = "Chapter 1" });
-            }
-
-            if (chapterListPointer != IntPtr.Zero)
-            {
-                NativeMethods.MP4Free(chapterListPointer);
-            }
-        }
-
-        private void WriteChapters(IntPtr fileHandle)
-        {
-            // Find the first video track, so that we make sure the total duration
-            // of the chapters we add does not exceed the length of the file.
-            int referenceTrackId = -1;
-            for (short i = 0; i < NativeMethods.MP4GetNumberOfTracks(fileHandle, null, 0); i++)
-            {
-                int currentTrackId = NativeMethods.MP4FindTrackId(fileHandle, i, null, 0);
-                string trackType = NativeMethods.MP4GetTrackType(fileHandle, currentTrackId);
-                if (trackType == NativeMethods.MP4VideoTrackType)
-                {
-                    referenceTrackId = currentTrackId;
-                    break;
-                }
-            }
-
-            // If we don't have a video track, then we have an audio file, which has
-            // only one track, and we can use it to find the duration.
-            referenceTrackId = referenceTrackId <= 0 ? 1 : referenceTrackId;
-            long referenceTrackDuration = NativeMethods.MP4ConvertFromTrackDuration(fileHandle, referenceTrackId, NativeMethods.MP4GetTrackDuration(fileHandle, referenceTrackId), NativeMethods.MP4TimeScale.Milliseconds);
-
-            long runningTotal = 0;
-            List<NativeMethods.MP4Chapter> nativeChapters = new List<NativeMethods.MP4Chapter>();
-            foreach (Chapter chapter in this.chapters)
-            {
-                NativeMethods.MP4Chapter nativeChapter = new NativeMethods.MP4Chapter();
-
-                // Set the title
-                nativeChapter.title = new byte[1024];
-                byte[] titleByteArray = Encoding.UTF8.GetBytes(chapter.Title);
-                Array.Copy(titleByteArray, nativeChapter.title, titleByteArray.Length);
-
-                // Set the duration, making sure that we only use durations up to
-                // the length of the reference track.
-                long chapterLength = (long)chapter.Duration.TotalMilliseconds;
-                if (runningTotal + chapterLength > referenceTrackDuration)
-                {
-                    nativeChapter.duration = referenceTrackDuration - runningTotal;
-                }
-                else
-                {
-                    nativeChapter.duration = chapterLength;
-                }
-
-                runningTotal += chapterLength;
-                nativeChapters.Add(nativeChapter);
-                if (runningTotal > referenceTrackDuration)
-                {
-                    break;
-                }
-            }
-
-            NativeMethods.MP4Chapter[] chapterArray = nativeChapters.ToArray();
-            NativeMethods.MP4SetChapters(fileHandle, chapterArray, chapterArray.Length, NativeMethods.MP4ChapterType.Qt);
         }
     }
 }

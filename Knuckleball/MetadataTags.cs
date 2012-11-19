@@ -25,13 +25,20 @@ using System.Text;
 namespace Knuckleball
 {
     /// <summary>
-    /// TODO: Represents the metadata tags of an MP4 file.
+    /// Represents the metadata tags of an MP4 file.
     /// </summary>
     public class MetadataTags : IDisposable
     {
         private MemoryStream artworkStream;
         private Image artwork;
         private bool isArtworkEdited;
+
+        /// <summary>
+        /// Prevents a default instance of the <see cref="MetadataTags"/> class from being created.
+        /// </summary>
+        private MetadataTags()
+        {
+        }
 
         /// <summary>
         /// Gets or sets the title of the content contained in this file.
@@ -363,7 +370,7 @@ namespace Knuckleball
         /// <param name="fileHandle">The handle to the file from which to read the tags.</param>
         /// <returns>A new instance of a <see cref="MetadataTags"/> object containing the values
         /// in the metadata tags for the file.</returns>
-        internal static MetadataTags Read(IntPtr fileHandle)
+        internal static MetadataTags ReadFromFile(IntPtr fileHandle)
         {
             IntPtr tagPtr = NativeMethods.MP4TagsAlloc();
             NativeMethods.MP4TagsFetch(tagPtr, fileHandle);
@@ -435,8 +442,8 @@ namespace Knuckleball
         /// <summary>
         /// Writes the tags to the specified file.
         /// </summary>
-        /// <param name="fileHandle">The handle to the file from which to read the tags.</param>
-        internal void Write(IntPtr fileHandle)
+        /// <param name="fileHandle">The handle to the file to which to write the tags.</param>
+        internal void WriteToFile(IntPtr fileHandle)
         {
             IntPtr tagsPtr = NativeMethods.MP4TagsAlloc();
             NativeMethods.MP4TagsFetch(tagsPtr, fileHandle);
@@ -716,7 +723,7 @@ namespace Knuckleball
         /// Releases all managed and unmanaged resources referenced by this instance.
         /// </summary>
         /// <param name="disposing"><see langword="true"/> to dispose of managed and unmanaged resources;
-        /// <see cref="false"/> to dispose of only unmanaged resources.</param>
+        /// <see langword="false"/> to dispose of only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
