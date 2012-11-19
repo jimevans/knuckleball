@@ -42,8 +42,7 @@ namespace Knuckleball.Tests
         [SetUp]
         public void Read()
         {
-            this.file = new MP4File(fileCopy);
-            this.file.ReadTags();
+            this.file = MP4File.Open(fileCopy);
         }
 
         [Test]
@@ -70,8 +69,8 @@ namespace Knuckleball.Tests
             this.file.Chapters[1].Duration = TimeSpan.FromSeconds(7);
             this.file.Chapters.Insert(1, new Chapter() { Title = "Inserted Chapter", Duration = TimeSpan.FromSeconds(8) });
 
-            this.file.WriteTags();
-            this.file.ReadTags();
+            this.file.Save();
+            this.file.Load();
 
             List<Chapter> expectedChapters = new List<Chapter>()
             {

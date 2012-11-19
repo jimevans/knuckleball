@@ -66,6 +66,7 @@
     <Compile Include="Atom.cs" />
     <Compile Include="Chapter.cs" />
     <Compile Include="ContentRating.cs" />
+    <Compile Include="MetadataTags.cs" />
     <Compile Include="MovieInfo.cs" />
     <Compile Include="Country.cs" />
     <Compile Include="IntPtrExtensions.cs" />

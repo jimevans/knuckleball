@@ -15,10 +15,9 @@ project, you should be able to do the following to change, say, the Title of the
 a file:
 
 ```c#
-MP4File file = new MP4File(@"C:\path\to\valid\mp4file.m4v");
-file.ReadTags();
-file.Title = "My New Title";
-file.WriteTags();
+MP4File file = MP4File.Open(@"C:\path\to\valid\mp4file.m4v");
+file.Tags.Title = "My New Title";
+file.Save();
 ```
 
 Please note that the API is very fluid at this point, and is likely to be changed without
@@ -36,10 +35,11 @@ attempt to read the tags.
 
 At present, reading and writing metadata tags is all that is implemented. Knuckleball should be
 able to read and write the tags from the project, including the so-called "reverse DNS" atoms.
-I would expect chapter editing support to be next on the list, but no guarantees on a schedule.
-I started this project because I wanted a metadata editing library, and I now have the functionality
-I need for my personal use. I will happily review pull requests, and discuss merging them into the 
-code base.
+It can now also read and write information about the chapters in a file. I would expect being
+able to read information about the tracks in a file to be next on the list, but no guarantees on
+a schedule. I started this project because I wanted a metadata editing library, and I now have the
+functionality I need for my personal use. I will happily review pull requests, and discuss merging
+them into the code base.
 
 ### Why did you want a .NET metadata editing library? Doesn't MetaX already do that?
 

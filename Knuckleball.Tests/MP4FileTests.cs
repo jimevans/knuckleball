@@ -14,21 +14,21 @@ namespace Knuckleball.Tests
         [ExpectedException(typeof(ArgumentException))]
         public void ShouldNotAllowNullFileName()
         {
-            MP4File file = new MP4File(null);
+            MP4File file = MP4File.Open(null);
         }
 
         [Test]
         [ExpectedException(typeof(ArgumentException))]
         public void ShouldNotAllowEmptyStringFileName()
         {
-            MP4File file = new MP4File(string.Empty);
+            MP4File file = MP4File.Open(string.Empty);
         }
 
         [Test]
         [ExpectedException(typeof(ArgumentException))]
         public void ShouldNotAllowFileNameWhichDoesNotExist()
         {
-            MP4File file = new MP4File(@"C:\This\Path\Does\Not\Exist\Nor\Does\This\File.m4v");
+            MP4File file = MP4File.Open(@"C:\This\Path\Does\Not\Exist\Nor\Does\This\File.m4v");
         }
     }
 }

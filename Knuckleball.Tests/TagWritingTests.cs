@@ -43,8 +43,7 @@ namespace Knuckleball.Tests
         [SetUp]
         public void Read()
         {
-            this.file = new MP4File(fileCopy);
-            this.file.ReadTags();
+            this.file = MP4File.Open(fileCopy);
         }
 
         private void RunSetValueTest(string propertyName, object expectedPropertyValue)
@@ -66,27 +65,26 @@ namespace Knuckleball.Tests
             // {
             //     Assert.AreEqual(expectedPropertyValue, this.file.PropertyName);
             // }
-            PropertyInfo propInfo = this.file.GetType().GetProperty(propertyName);
+            PropertyInfo propInfo = this.file.Tags.GetType().GetProperty(propertyName);
             if (propInfo == null)
             {
                 throw new InvalidOperationException("No property on the object with the name " + propertyName);
             }
 
-            object originalValue = propInfo.GetValue(this.file, null);
-            propInfo.SetValue(this.file, expectedPropertyValue, null);
+            object originalValue = propInfo.GetValue(this.file.Tags, null);
+            propInfo.SetValue(this.file.Tags, expectedPropertyValue, null);
 
-            this.file.WriteTags();
+            this.file.Save();
 
-            this.file = new MP4File(this.fileCopy);
-            this.file.ReadTags();
-            propInfo = this.file.GetType().GetProperty(propertyName);
+            this.file = MP4File.Open(this.fileCopy);
+            propInfo = this.file.Tags.GetType().GetProperty(propertyName);
             if (expectedPropertyValue == null)
             {
-                Assert.IsNull(propInfo.GetValue(this.file, null));
+                Assert.IsNull(propInfo.GetValue(this.file.Tags, null));
             }
             else
             {
-                Assert.AreEqual(expectedPropertyValue, propInfo.GetValue(this.file, null));
+                Assert.AreEqual(expectedPropertyValue, propInfo.GetValue(this.file.Tags, null));
             }
         }
 
@@ -174,7 +172,7 @@ namespace Knuckleball.Tests
             // Test that we can write a null value to the tag too.
             // Note: setting TrackNumber to null implies TotalTracks is also null.
             RunSetValueTest("TrackNumber", null);
-            Assert.IsNull(this.file.TotalTracks);
+            Assert.IsNull(this.file.Tags.TotalTracks);
         }
 
         [Test]
@@ -189,7 +187,7 @@ namespace Knuckleball.Tests
             // Test that we can write a null value to the tag too.
             // Note: setting TotalTracks to null implies TrackNumber is also null.
             RunSetValueTest("TotalTracks", null);
-            Assert.IsNull(this.file.TrackNumber);
+            Assert.IsNull(this.file.Tags.TrackNumber);
         }
 
         [Test]
@@ -204,7 +202,7 @@ namespace Knuckleball.Tests
             // Test that we can write a null value to the tag too.
             // Note: setting DiscNumber to null implies TotalDiscs is also null.
             RunSetValueTest("DiscNumber", null);
-            Assert.IsNull(this.file.TotalDiscs);
+            Assert.IsNull(this.file.Tags.TotalDiscs);
         }
 
         [Test]
@@ -219,7 +217,7 @@ namespace Knuckleball.Tests
             // Test that we can write a null value to the tag too.
             // Note: setting TotalDiscs to null implies DiscNumber is also null.
             RunSetValueTest("TotalDiscs", null);
-            Assert.IsNull(this.file.DiscNumber);
+            Assert.IsNull(this.file.Tags.DiscNumber);
         }
 
         [Test]
@@ -330,18 +328,18 @@ namespace Knuckleball.Tests
         public void ShouldWriteArtwork()
         {
             Image newArtwork = Image.FromFile(Path.Combine(TestFileUtilities.GetTestFileDirectory(), "NewArtwork.png"));
-            this.file.Artwork = newArtwork;
-            this.file.WriteTags();
+            this.file.Tags.Artwork = newArtwork;
+            this.file.Save();
 
-            this.file.ReadTags();
-            Assert.AreEqual(1, this.file.ArtworkCount);
-            Assert.AreEqual("577f318762da53a41aa57d43ba6480ea", this.ComputeHash(this.file.Artwork, this.file.ArtworkFormat));
+            this.file.Load();
+            Assert.AreEqual(1, this.file.Tags.ArtworkCount);
+            Assert.AreEqual("577f318762da53a41aa57d43ba6480ea", this.ComputeHash(this.file.Tags.Artwork, this.file.Tags.ArtworkFormat));
 
-            this.file.Artwork = null;
-            this.file.WriteTags();
-            this.file.ReadTags();
-            Assert.AreEqual(0, this.file.ArtworkCount);
-            Assert.IsNull(this.file.Artwork);
+            this.file.Tags.Artwork = null;
+            this.file.Save();
+            this.file.Load();
+            Assert.AreEqual(0, this.file.Tags.ArtworkCount);
+            Assert.IsNull(this.file.Tags.Artwork);
         }
 
         [Test]
@@ -534,19 +532,19 @@ namespace Knuckleball.Tests
             ratingInfo.RatingSource = "mpaa";
             ratingInfo.Rating = "G";
             ratingInfo.SortValue = 100;
-            this.file.RatingInfo = ratingInfo;
-            this.file.WriteTags();
+            this.file.Tags.RatingInfo = ratingInfo;
+            this.file.Save();
 
-            this.file.ReadTags();
-            Assert.AreEqual("mpaa", this.file.RatingInfo.RatingSource);
-            Assert.AreEqual("G", this.file.RatingInfo.Rating);
-            Assert.AreEqual(100, this.file.RatingInfo.SortValue);
-            Assert.AreEqual(string.Empty, this.file.RatingInfo.RatingAnnotation);
+            this.file.Load();
+            Assert.AreEqual("mpaa", this.file.Tags.RatingInfo.RatingSource);
+            Assert.AreEqual("G", this.file.Tags.RatingInfo.Rating);
+            Assert.AreEqual(100, this.file.Tags.RatingInfo.SortValue);
+            Assert.AreEqual(string.Empty, this.file.Tags.RatingInfo.RatingAnnotation);
 
-            this.file.RatingInfo = null;
-            this.file.WriteTags();
-            this.file.ReadTags();
-            Assert.IsNull(this.file.RatingInfo);
+            this.file.Tags.RatingInfo = null;
+            this.file.Save();
+            this.file.Load();
+            Assert.IsNull(this.file.Tags.RatingInfo);
         }
 
         [Test]
@@ -560,35 +558,35 @@ namespace Knuckleball.Tests
             movieInfo.Screenwriters.Add("Herman J. Manciewicz");
             movieInfo.Studio = "WonderBoy Productions";
 
-            this.file.MovieInfo = movieInfo;
-            this.file.WriteTags();
+            this.file.Tags.MovieInfo = movieInfo;
+            this.file.Save();
 
-            this.file.ReadTags();
-            Assert.That(file.MovieInfo.Cast, Is.EquivalentTo(new List<string>() { "Jimmy Bear" }));
-            Assert.That(file.MovieInfo.Directors, Is.EquivalentTo(new List<string>() { "Orson Welles" }));
-            Assert.That(file.MovieInfo.Producers, Is.EquivalentTo(new List<string>() { "Jim Evans" }));
-            Assert.That(file.MovieInfo.Screenwriters, Is.EquivalentTo(new List<string>() { "Herman J. Manciewicz" }));
-            Assert.AreEqual("WonderBoy Productions", file.MovieInfo.Studio);
+            this.file.Load();
+            Assert.That(file.Tags.MovieInfo.Cast, Is.EquivalentTo(new List<string>() { "Jimmy Bear" }));
+            Assert.That(file.Tags.MovieInfo.Directors, Is.EquivalentTo(new List<string>() { "Orson Welles" }));
+            Assert.That(file.Tags.MovieInfo.Producers, Is.EquivalentTo(new List<string>() { "Jim Evans" }));
+            Assert.That(file.Tags.MovieInfo.Screenwriters, Is.EquivalentTo(new List<string>() { "Herman J. Manciewicz" }));
+            Assert.AreEqual("WonderBoy Productions", file.Tags.MovieInfo.Studio);
 
             // Test can have a null part of the MovieInfo
-            file.MovieInfo.RemoveCast();
-            this.file.WriteTags();
-            this.file.ReadTags();
-            Assert.IsFalse(file.MovieInfo.HasCast);
+            file.Tags.MovieInfo.RemoveCast();
+            this.file.Save();
+            this.file.Load();
+            Assert.IsFalse(file.Tags.MovieInfo.HasCast);
 
             // Touch the Cast property; it should be recreated.
             // Test can have a zero-length list for the MovieInfo.
-            int count = this.file.MovieInfo.Cast.Count;
-            this.file.WriteTags();
-            this.file.ReadTags();
-            Assert.IsTrue(file.MovieInfo.HasCast);
-            Assert.AreEqual(0, file.MovieInfo.Cast.Count);
+            int count = this.file.Tags.MovieInfo.Cast.Count;
+            this.file.Save();
+            this.file.Load();
+            Assert.IsTrue(file.Tags.MovieInfo.HasCast);
+            Assert.AreEqual(0, file.Tags.MovieInfo.Cast.Count);
 
             // Test the null case.
-            this.file.MovieInfo = null;
-            this.file.WriteTags();
-            this.file.ReadTags();
-            Assert.IsNull(this.file.MovieInfo);
+            this.file.Tags.MovieInfo = null;
+            this.file.Save();
+            this.file.Load();
+            Assert.IsNull(this.file.Tags.MovieInfo);
         }
 
         // The following are tags unique to TV Episodes
