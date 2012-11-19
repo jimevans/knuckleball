@@ -45,7 +45,7 @@ namespace Knuckleball
         }
 
         /// <summary>
-        /// Returns the hash code for this <see cref="RatingsInfo"/>.
+        /// Returns the hash code for this <see cref="Chapter"/>.
         /// </summary>
         /// <returns>A 32-bit signed integer hash code.</returns>
         public override int GetHashCode()

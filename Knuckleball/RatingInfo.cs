@@ -83,7 +83,7 @@ namespace Knuckleball
         }
 
         /// <summary>
-        /// Returns the hash code for this <see cref="RatingsInfo"/>.
+        /// Returns the hash code for this <see cref="RatingInfo"/>.
         /// </summary>
         /// <returns>A 32-bit signed integer hash code.</returns>
         public override int GetHashCode()
@@ -92,11 +92,11 @@ namespace Knuckleball
         }
 
         /// <summary>
-        /// Determines whether two <see cref="RatingsInfo"/> objects have the same value.
+        /// Determines whether two <see cref="RatingInfo"/> objects have the same value.
         /// </summary>
         /// <param name="obj">Determines whether this instance and a specified object, which
-        /// must also be a <see cref="RatingsInfo"/> object, have the same value.</param>
-        /// <returns><see langword="true"/> if obj is a <see cref="RatingsInfo"/> and its value
+        /// must also be a <see cref="RatingInfo"/> object, have the same value.</param>
+        /// <returns><see langword="true"/> if obj is a <see cref="RatingInfo"/> and its value
         /// is the same as this instance; otherwise, <see langword="false"/>.</returns>
         public override bool Equals(object obj)
         {
@@ -118,7 +118,7 @@ namespace Knuckleball
         /// Populates this <see cref="RatingInfo"/> with the specific data stored in it in the referenced file.
         /// </summary>
         /// <param name="dataBuffer">A byte array containing the iTunes Metadata Format data
-        /// used to populate this <see cref="RatingsInfo"/>.</param>
+        /// used to populate this <see cref="RatingInfo"/>.</param>
         internal override void Populate(byte[] dataBuffer)
         {
             string ratingString = Encoding.UTF8.GetString(dataBuffer);

@@ -106,7 +106,7 @@ namespace Knuckleball
         /// <param name="value">The <see cref="IntPtr"/> value indicating the location
         /// in memory at which to begin reading data.</param>
         /// <returns><see langword="true"/> if the value pointed to by this <see cref="IntPtr"/>
-        /// is non-zero; <see cref="false"/> if the value pointed to is zero.
+        /// is non-zero; <see langword="false"/> if the value pointed to is zero.
         /// Returns <see langword="null"/> if this pointer is a null pointer (<see cref="IntPtr.Zero"/>).</returns>
         public static bool? ReadBoolean(this IntPtr value)
         {
