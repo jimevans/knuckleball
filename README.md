@@ -33,13 +33,13 @@ attempt to read the tags.
 
 ### What functionality of the mp4v2 project is supported?
 
-At present, reading and writing metadata tags is all that is implemented. Knuckleball should be
-able to read and write the tags from the project, including the so-called "reverse DNS" atoms.
-It can now also read and write information about the chapters in a file. I would expect being
-able to read information about the tracks in a file to be next on the list, but no guarantees on
-a schedule. I started this project because I wanted a metadata editing library, and I now have the
-functionality I need for my personal use. I will happily review pull requests, and discuss merging
-them into the code base.
+At present, reading and writing metadata tags and chapter information is all that is implemented.
+Knuckleball should be able to read and write the tags from the project, including the so-called
+"reverse DNS" atoms, and read and write information about the chapters in a file. I would expect
+being able to read information about the tracks in a file like track type, duration, bitrate and
+so on, to be next on the list, but no guarantees on a schedule. I started this project because I
+wanted a metadata editing library, and I now have the functionality I need for my personal use. I
+will happily review pull requests, and discuss merging them into the code base.
 
 ### Why did you want a .NET metadata editing library? Doesn't MetaX already do that?
 
