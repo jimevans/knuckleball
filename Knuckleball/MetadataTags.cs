@@ -910,7 +910,12 @@ namespace Knuckleball
             }
             else
             {
-                NativeMethods.MP4TagDisk discInfo = discInfoPtr.ReadStructure<NativeMethods.MP4TagDisk>();
+                NativeMethods.MP4TagDisk discInfo = new NativeMethods.MP4TagDisk();
+                if (discInfoPtr != IntPtr.Zero)
+                {
+                    discInfoPtr.ReadStructure<NativeMethods.MP4TagDisk>();
+                }
+
                 if (this.DiscNumber.Value != discInfo.index || this.TotalDiscs != discInfo.total)
                 {
                     discInfo.index = this.DiscNumber.Value;
@@ -943,7 +948,12 @@ namespace Knuckleball
             }
             else
             {
-                NativeMethods.MP4TagTrack trackInfo = trackInfoPtr.ReadStructure<NativeMethods.MP4TagTrack>();
+                NativeMethods.MP4TagTrack trackInfo = new NativeMethods.MP4TagTrack();
+                if (trackInfoPtr != IntPtr.Zero)
+                {
+                    trackInfo = trackInfoPtr.ReadStructure<NativeMethods.MP4TagTrack>();
+                }
+
                 if (this.TrackNumber.Value != trackInfo.index || this.TotalTracks != trackInfo.total)
                 {
                     trackInfo.index = this.TrackNumber.Value;
