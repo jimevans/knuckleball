@@ -905,7 +905,7 @@ namespace Knuckleball
 
         private void WriteDiscInfo(IntPtr tagsPtr, IntPtr discInfoPtr)
         {
-            if (this.DiscNumber == null || this.TotalDiscs == null)
+            if (this.DiscNumber == null && this.TotalDiscs == null)
             {
                 NativeMethods.MP4TagsSetDisk(tagsPtr, IntPtr.Zero);
             }
@@ -919,8 +919,8 @@ namespace Knuckleball
 
                 if (this.DiscNumber.Value != discInfo.index || this.TotalDiscs != discInfo.total)
                 {
-                    discInfo.index = this.DiscNumber.Value;
-                    discInfo.total = this.TotalDiscs.Value;
+                    discInfo.index = (this.DiscNumber == null ? (short)0 : this.DiscNumber.Value);
+                    discInfo.total = (this.TotalDiscs == null ? (short)0 : this.TotalDiscs.Value);
                     IntPtr discPtr = Marshal.AllocHGlobal(Marshal.SizeOf(discInfo));
                     Marshal.StructureToPtr(discInfo, discPtr, false);
                     NativeMethods.MP4TagsSetDisk(tagsPtr, discPtr);
@@ -943,7 +943,7 @@ namespace Knuckleball
 
         private void WriteTrackInfo(IntPtr tagsPtr, IntPtr trackInfoPtr)
         {
-            if (this.TrackNumber == null || this.TotalTracks == null)
+            if (this.TrackNumber == null && this.TotalTracks == null)
             {
                 NativeMethods.MP4TagsSetTrack(tagsPtr, IntPtr.Zero);
             }
@@ -957,8 +957,8 @@ namespace Knuckleball
 
                 if (this.TrackNumber.Value != trackInfo.index || this.TotalTracks != trackInfo.total)
                 {
-                    trackInfo.index = this.TrackNumber.Value;
-                    trackInfo.total = this.TotalTracks.Value;
+                    trackInfo.index = (this.TrackNumber == null ? (short)0 : this.TrackNumber.Value);
+                    trackInfo.total = (this.TotalTracks == null ? (short)0 : this.TotalTracks.Value);
                     IntPtr trackPtr = Marshal.AllocHGlobal(Marshal.SizeOf(trackInfo));
                     Marshal.StructureToPtr(trackInfo, trackPtr, false);
                     NativeMethods.MP4TagsSetTrack(tagsPtr, trackPtr);
