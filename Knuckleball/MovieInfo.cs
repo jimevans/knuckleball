@@ -248,7 +248,7 @@ namespace Knuckleball
         /// </summary>
         /// <param name="dataBuffer">A byte array containing the iTunes Metadata Format data
         /// used to populate this <see cref="MovieInfo"/>.</param>
-        internal override void Populate(byte[] dataBuffer)
+        public override void Populate(byte[] dataBuffer)
         {
             Dictionary<string, object> map = null;
             using (MemoryStream stream = new MemoryStream(dataBuffer))

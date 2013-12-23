@@ -69,6 +69,7 @@
   <ItemGroup>
     <Compile Include="ChapterListTests.cs" />
     <Compile Include="ChapterTests.cs" />
+    <Compile Include="MovieAtomParsingTests.cs" />
     <Compile Include="TagWritingTests.cs" />
     <Compile Include="IntPtrExtensionTests.cs" />
     <Compile Include="MovieReadTagTests.cs" />

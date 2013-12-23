@@ -119,7 +119,7 @@ namespace Knuckleball
         /// </summary>
         /// <param name="dataBuffer">A byte array containing the iTunes Metadata Format data
         /// used to populate this <see cref="RatingInfo"/>.</param>
-        internal override void Populate(byte[] dataBuffer)
+        public override void Populate(byte[] dataBuffer)
         {
             string ratingString = Encoding.UTF8.GetString(dataBuffer);
             string[] parts = ratingString.Split('|');

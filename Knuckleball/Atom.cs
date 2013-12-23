@@ -93,7 +93,7 @@ namespace Knuckleball
         /// </summary>
         /// <param name="dataBuffer">A byte array containing the iTunes Metadata Format data
         /// used to populate this <see cref="Atom"/>.</param>
-        internal abstract void Populate(byte[] dataBuffer);
+        public abstract void Populate(byte[] dataBuffer);
 
         /// <summary>
         /// Returns the data to be stored in this <see cref="Atom"/> as a byte array.
