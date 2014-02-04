@@ -248,7 +248,7 @@ namespace Knuckleball
         /// Gets or sets a value indicating whether the content contained in this file is high-definition video.
         /// May be <see langword="null"/> if the value is not set in the file.
         /// </summary>
-        public bool? IsHDVideo { get; set; }
+        public HDKind? IsHDVideo { get; set; }
 
         /// <summary>
         /// Gets or sets the type of media for the content contained in this file.
@@ -417,7 +417,7 @@ namespace Knuckleball
             managedTags.Keywords = tags.keywords;
             managedTags.Category = tags.category;
 
-            managedTags.IsHDVideo = tags.hdVideo.ReadBoolean();
+            managedTags.IsHDVideo = tags.hdVideo.ReadEnumValue<HDKind>(HDKind.SD);
             managedTags.MediaType = tags.mediaType.ReadEnumValue<MediaKind>(MediaKind.NotSet);
             managedTags.ContentRating = tags.contentRating.ReadEnumValue<ContentRating>(ContentRating.NotSet);
             managedTags.IsGapless = tags.gapless.ReadBoolean();
@@ -613,9 +613,10 @@ namespace Knuckleball
                 NativeMethods.MP4TagsSetCategory(tagsPtr, this.Category);
             }
 
-            if (this.IsHDVideo != tags.hdVideo.ReadBoolean())
+            if (this.IsHDVideo != tags.hdVideo.ReadEnumValue<HDKind>(HDKind.SD))
             {
-                tagsPtr.WriteBoolean(this.IsHDVideo, NativeMethods.MP4TagsSetHDVideo);
+                byte? HDKindValue = this.IsHDVideo == HDKind.SD ? null : (byte?)this.IsHDVideo;
+                tagsPtr.WriteByte(HDKindValue, NativeMethods.MP4TagsSetHDVideo);
             }
 
             if (this.MediaType != tags.mediaType.ReadEnumValue<MediaKind>(MediaKind.NotSet))
@@ -904,7 +905,7 @@ namespace Knuckleball
 
         private void WriteDiscInfo(IntPtr tagsPtr, IntPtr discInfoPtr)
         {
-            if (this.DiscNumber == null || this.TotalDiscs == null)
+            if (this.DiscNumber == null && this.TotalDiscs == null)
             {
                 NativeMethods.MP4TagsSetDisk(tagsPtr, IntPtr.Zero);
             }
@@ -918,8 +919,8 @@ namespace Knuckleball
 
                 if (this.DiscNumber.Value != discInfo.index || this.TotalDiscs != discInfo.total)
                 {
-                    discInfo.index = this.DiscNumber.Value;
-                    discInfo.total = this.TotalDiscs.Value;
+                    discInfo.index = (this.DiscNumber == null ? (short)0 : this.DiscNumber.Value);
+                    discInfo.total = (this.TotalDiscs == null ? (short)0 : this.TotalDiscs.Value);
                     IntPtr discPtr = Marshal.AllocHGlobal(Marshal.SizeOf(discInfo));
                     Marshal.StructureToPtr(discInfo, discPtr, false);
                     NativeMethods.MP4TagsSetDisk(tagsPtr, discPtr);
@@ -942,7 +943,7 @@ namespace Knuckleball
 
         private void WriteTrackInfo(IntPtr tagsPtr, IntPtr trackInfoPtr)
         {
-            if (this.TrackNumber == null || this.TotalTracks == null)
+            if (this.TrackNumber == null && this.TotalTracks == null)
             {
                 NativeMethods.MP4TagsSetTrack(tagsPtr, IntPtr.Zero);
             }
@@ -956,8 +957,8 @@ namespace Knuckleball
 
                 if (this.TrackNumber.Value != trackInfo.index || this.TotalTracks != trackInfo.total)
                 {
-                    trackInfo.index = this.TrackNumber.Value;
-                    trackInfo.total = this.TotalTracks.Value;
+                    trackInfo.index = (this.TrackNumber == null ? (short)0 : this.TrackNumber.Value);
+                    trackInfo.total = (this.TotalTracks == null ? (short)0 : this.TotalTracks.Value);
                     IntPtr trackPtr = Marshal.AllocHGlobal(Marshal.SizeOf(trackInfo));
                     Marshal.StructureToPtr(trackInfo, trackPtr, false);
                     NativeMethods.MP4TagsSetTrack(tagsPtr, trackPtr);
