@@ -255,6 +255,8 @@ namespace Knuckleball
             {
                 using (XmlTextReader reader = new XmlTextReader(stream))
                 {
+                    reader.XmlResolver = null;
+                    reader.DtdProcessing = DtdProcessing.Parse;
                     reader.WhitespaceHandling = WhitespaceHandling.None;
                     while (reader.Name != "plist" && !reader.IsStartElement())
                     {
