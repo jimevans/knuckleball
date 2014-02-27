@@ -383,7 +383,8 @@ namespace Knuckleball
             managedTags.Grouping = tags.grouping;
             managedTags.Composer = tags.composer;
             managedTags.Comment = tags.comment;
-            managedTags.Genre = tags.genre;
+            managedTags.Genre = tags.genre
+            managedTags.ReleaseDate = tags.releaseDate;
             managedTags.ReadTrackInfo(tags.track);
             managedTags.ReadDiskInfo(tags.disk);
             managedTags.Tempo = tags.tempo.ReadShort();
@@ -391,6 +392,7 @@ namespace Knuckleball
             managedTags.Copyright = tags.copyright;
             managedTags.EncodingTool = tags.encodingTool;
             managedTags.EncodedBy = tags.encodedBy;
+            managedTags.PurchasedDate = tags.purchasedDate;
 
             // Tags specific to TV Episodes.
             managedTags.EpisodeNumber = tags.tvEpisode.ReadInt();
